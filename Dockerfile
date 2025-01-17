@@ -18,6 +18,7 @@ WORKDIR /app
 COPY package.json ./
 COPY pnpm-lock.yaml ./
 COPY tsconfig.json ./
+COPY twitter_cookies.json ./
 
 # Copy the rest of the application code
 COPY ./src ./src
@@ -55,6 +56,7 @@ COPY --from=builder /app/characters /app/characters
 COPY --from=builder /app/dist /app/dist
 COPY --from=builder /app/tsconfig.json /app/
 COPY --from=builder /app/pnpm-lock.yaml /app/
+COPY --from=builder /app/twitter_cookies.json /app/
 
 EXPOSE 3000
 # Set the command to run the application
