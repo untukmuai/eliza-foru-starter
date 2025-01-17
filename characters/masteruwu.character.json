@@ -1,7 +1,7 @@
 {
     "name": "masteruwu",
     "clients": [
-      "twitter"
+      "telegram"
     ],
     "modelProvider": "google",
     "plugins": [],
