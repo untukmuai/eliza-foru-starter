@@ -1,8 +1,9 @@
 
-import { Character, ModelProviderName, settings, validateCharacterConfig } from "@elizaos/core";
+import { Character, elizaLogger, ModelProviderName, settings, validateCharacterConfig } from "@elizaos/core";
 import fs from "fs";
 import path from "path";
 import yargs from "yargs";
+import db from "../../models";
 
 export function parseArguments(): {
   character?: string;
@@ -54,6 +55,26 @@ export async function loadCharacters(
   }
 
   return loadedCharacters;
+}
+
+export async function loadCharactersFromDB(): Promise<Character[]> {
+  await db.sequelize.sync({ force: true });
+  console.log("Database synced");
+
+  const loadedCharacters = [];
+  try {
+    db.CharacterConfig.findAll().then((characters) => {
+      characters.forEach((character) => {
+        elizaLogger.debug(`Loaded character ${character.name}`);
+        character = JSON.parse(character.character);
+        validateCharacterConfig(character);
+        loadedCharacters.push(character);
+      });
+    });
+  } catch (e) {
+    console.error(`Error loading character from DB: ${e}`);
+  }
+  return Promise.resolve(loadedCharacters);
 }
 
 export function getTokenForProvider(
