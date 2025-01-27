@@ -58,8 +58,6 @@ export async function loadCharacters(
 }
 
 export async function loadCharactersFromDB(): Promise<Character[]> {
-  await db.sequelize.sync({ force: true });
-  console.log("Database synced");
 
   const loadedCharacters = [];
   try {

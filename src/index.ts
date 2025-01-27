@@ -129,9 +129,9 @@ const startAgents = async () => {
     characters = await loadCharacters(charactersArg);
   }
   console.log("characters", characters);
-  // console.log("loading characters from db");
-  // await loadCharactersFromDB();
-  // console.log("characters", characters);
+  console.log("loading characters from db");
+  await loadCharactersFromDB();
+  console.log("characters", characters);
   try {
     for (const character of characters) {
       await startAgent(character, directClient as DirectClient);
