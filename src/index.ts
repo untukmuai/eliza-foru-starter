@@ -16,7 +16,6 @@ import { startChat } from "./chat/index.ts";
 import { initializeClients } from "./clients/index.ts";
 import {
   getTokenForProvider,
-  loadCharacters,
   loadCharactersFromDB,
   parseArguments,
 } from "./config/index.ts";
@@ -121,16 +120,10 @@ const startAgents = async () => {
   let serverPort = parseInt(settings.SERVER_PORT || "3000");
   const args = parseArguments();
 
-  let charactersArg = args.characters || args.character;
   let characters = [character];
 
-  console.log("charactersArg", charactersArg);
-  if (charactersArg) {
-    characters = await loadCharacters(charactersArg);
-  }
-  console.log("characters", characters);
   console.log("loading characters from db");
-  await loadCharactersFromDB();
+  characters.push(...(await loadCharactersFromDB()));
   console.log("characters", characters);
   try {
     for (const character of characters) {

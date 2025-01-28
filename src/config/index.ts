@@ -1,5 +1,10 @@
-
-import { Character, elizaLogger, ModelProviderName, settings, validateCharacterConfig } from "@elizaos/core";
+import {
+  Character,
+  elizaLogger,
+  ModelProviderName,
+  settings,
+  validateCharacterConfig,
+} from "@elizaos/core";
 import fs from "fs";
 import path from "path";
 import yargs from "yargs";
@@ -26,49 +31,18 @@ export function parseArguments(): {
   }
 }
 
-export async function loadCharacters(
-  charactersArg: string
-): Promise<Character[]> {
-  let characterPaths = charactersArg?.split(",").map((filePath) => {
-    if (path.basename(filePath) === filePath) {
-      filePath = "../characters/" + filePath;
-    }
-    return path.resolve(process.cwd(), filePath.trim());
-  });
-
-  const loadedCharacters = [];
-
-  if (characterPaths?.length > 0) {
-    for (const path of characterPaths) {
-      try {
-        const character = JSON.parse(fs.readFileSync(path, "utf8"));
-
-        validateCharacterConfig(character);
-
-        loadedCharacters.push(character);
-      } catch (e) {
-        console.error(`Error loading character from ${path}: ${e}`);
-        // don't continue to load if a specified file is not found
-        process.exit(1);
-      }
-    }
-  }
-
-  return loadedCharacters;
-}
-
 export async function loadCharactersFromDB(): Promise<Character[]> {
-
   const loadedCharacters = [];
   try {
-    db.CharacterConfig.findAll().then((characters) => {
-      characters.forEach((character) => {
-        elizaLogger.debug(`Loaded character ${character.name}`);
-        character = JSON.parse(character.character);
-        validateCharacterConfig(character);
-        loadedCharacters.push(character);
-      });
-    });
+    const result = await db.CharacterConfig.findAll();
+    console.log(`Loaded ${result.length} characters from DB`);
+    for (const character of result) {
+      const characterData = character.get();
+      console.log(`Loaded character ${characterData.name}`);
+      const characterConf = characterData.character;
+      validateCharacterConfig(characterConf);
+      loadedCharacters.push(characterConf);
+    }
   } catch (e) {
     console.error(`Error loading character from DB: ${e}`);
   }

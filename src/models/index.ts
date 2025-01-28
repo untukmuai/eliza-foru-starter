@@ -40,25 +40,37 @@ if (config.use_env_variable) {
   );
 }
 
-fs.readdirSync(__dirname)
-  .filter((file) => {
-    return (
-      file.indexOf(".") !== 0 &&
-      file !== basename &&
-      file.slice(-3) === ".ts" &&
-      file.indexOf(".test.ts") === -1
-    );
-  })
-  .forEach(async (file) => {
-    try {
-      const modelPath = path.join(__dirname, file);
-      const modelModule = await import(modelPath); // Dynamic import
-      const model = modelModule.default(sequelize, DataTypes); // Call the model function
-      db[model.name] = model; // Add the model to the db object
-    } catch (err) {
-      console.error(`Failed to load model ${file}:`, err);
-    }  
-  });
+// Load models asynchronously
+const modelFiles = fs.readdirSync(__dirname).filter((file) => {
+  return (
+    file.indexOf(".") !== 0 &&
+    file !== basename &&
+    file.slice(-3) === ".ts" &&
+    file.indexOf(".test.ts") === -1
+  );
+});
+
+const modelPromises = modelFiles.map(async (file) => {
+  try {
+    const modelPath = path.join(__dirname, file);
+    const modelModule = await import(modelPath);
+    const model = modelModule.default(sequelize, DataTypes);
+
+    console.log("Loaded model:", model);
+
+    if (model.name) {
+      db[model.name] = model; // Store the model in the db object
+      console.log(`Added model to db: ${model.name}`);
+    } else {
+      console.error(`Model does not have a valid modelName:`, model);
+    }
+  } catch (err) {
+    console.error(`Failed to load model ${file}:`, err);
+  }
+});
+
+// Wait for all models to load
+await Promise.all(modelPromises);
 
 Object.keys(db).forEach((modelName) => {
   if (db[modelName].associate) {
