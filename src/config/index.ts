@@ -1,12 +1,9 @@
 import {
   Character,
-  elizaLogger,
   ModelProviderName,
   settings,
   validateCharacterConfig,
 } from "@elizaos/core";
-import fs from "fs";
-import path from "path";
 import yargs from "yargs";
 import db from "../models/index.ts";
 
