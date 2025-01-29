@@ -1,8 +1,14 @@
-
-import { Character, ModelProviderName, settings, validateCharacterConfig } from "@elizaos/core";
+import {
+  Character,
+  elizaLogger,
+  ModelProviderName,
+  settings,
+  validateCharacterConfig,
+} from "@elizaos/core";
 import fs from "fs";
 import path from "path";
 import yargs from "yargs";
+import db from "../models/index.ts";
 
 export function parseArguments(): {
   character?: string;
@@ -25,35 +31,22 @@ export function parseArguments(): {
   }
 }
 
-export async function loadCharacters(
-  charactersArg: string
-): Promise<Character[]> {
-  let characterPaths = charactersArg?.split(",").map((filePath) => {
-    if (path.basename(filePath) === filePath) {
-      filePath = "../characters/" + filePath;
-    }
-    return path.resolve(process.cwd(), filePath.trim());
-  });
-
+export async function loadCharactersFromDB(): Promise<Character[]> {
   const loadedCharacters = [];
-
-  if (characterPaths?.length > 0) {
-    for (const path of characterPaths) {
-      try {
-        const character = JSON.parse(fs.readFileSync(path, "utf8"));
-
-        validateCharacterConfig(character);
-
-        loadedCharacters.push(character);
-      } catch (e) {
-        console.error(`Error loading character from ${path}: ${e}`);
-        // don't continue to load if a specified file is not found
-        process.exit(1);
-      }
+  try {
+    const result = await db.CharacterConfig.findAll();
+    console.log(`Loaded ${result.length} characters from DB`);
+    for (const character of result) {
+      const characterData = character.get();
+      console.log(`Loaded character ${characterData.name}`);
+      const characterConf = characterData.character;
+      validateCharacterConfig(characterConf);
+      loadedCharacters.push(characterConf);
     }
+  } catch (e) {
+    console.error(`Error loading character from DB: ${e}`);
   }
-
-  return loadedCharacters;
+  return Promise.resolve(loadedCharacters);
 }
 
 export function getTokenForProvider(
