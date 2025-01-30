@@ -30,9 +30,30 @@ import { REST, Routes } from "discord.js";
 import { stringToUuid } from "@elizaos/core";
 import db from "../models/index.ts";
 
+function apiKeyMiddleware(req, res, next) {
+  const apiKey = req.headers["x-api-key"] || req.query.api_key;
+
+  if (!apiKey) {
+    return res.status(401).json({ error: "API key is missing" });
+  }
+
+  const validApiKey = getEnvVariable("API_KEY_DIRECT");
+
+  if (apiKey !== validApiKey) {
+    return res.status(401).json({ error: "Invalid API key" });
+  }
+
+  next();
+}
+
 function createApiRouter(agents, directClient) {
+  if (!getEnvVariable("API_KEY_DIRECT")){
+    elizaLogger.error("API_KEY_DIRECT is not set in environment variables");
+    process.exit(1);
+  }
   const router = express.Router();
   router.use(cors());
+  router.use(apiKeyMiddleware);
   router.use(bodyParser.json());
   router.use(bodyParser.urlencoded({ extended: true }));
   router.use(
