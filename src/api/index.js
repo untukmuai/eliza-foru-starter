@@ -53,7 +53,6 @@ function createApiRouter(agents, directClient) {
   }
   const router = express.Router();
   router.use(cors());
-  router.use(apiKeyMiddleware);
   router.use(bodyParser.json());
   router.use(bodyParser.urlencoded({ extended: true }));
   router.use(
@@ -62,8 +61,9 @@ function createApiRouter(agents, directClient) {
     })
   );
   router.get("/", (req, res) => {
-    res.send("Welcome to untukmu AI Agent");
+    res.send("Liveness check passed");
   });
+  router.use(apiKeyMiddleware);
   router.get("/agents", (req, res) => {
     const agentsList = Array.from(agents.values()).map((agent) => ({
       id: agent.agentId,
