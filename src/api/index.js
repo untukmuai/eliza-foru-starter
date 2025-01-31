@@ -95,15 +95,16 @@ function createApiRouter(agents, directClient) {
       const characterConfig = await db.CharacterConfig.findOne({
         where: { name: character.name },
       });
-      if (!characterConfig) {
-        throw new Error(`CharacterConfig with name "${name}" not found.`);
+      if (!characterConfig){
+        throw new Error(`CharacterConfig with name "${character.name}" not found.`);
       }
-      characterConfig.character = character;
-      characterConfig.updatedAt = new Date();
+      console.log("CharacterConfig found:", characterConfig);
+      characterConfig.dataValues.character = character;
+      characterConfig.dataValues.updatedAt = new Date();
       try {
         console.log("Before save:", characterConfig);
-        await characterConfig.save();
-        console.log("CharacterConfig saved successfully.");
+        const result = await characterConfig.save();
+        console.log("CharacterConfig saved successfully: ", result);
       } catch (error) {
         console.error("Error saving characterConfig:", error);
       }
@@ -136,7 +137,9 @@ function createApiRouter(agents, directClient) {
         where: { name: character.name },
       });
       if (characterConfig) {
-        throw new Error(`CharacterConfig with name "${name}" already exists.`);
+        throw new Error(
+          `CharacterConfig with name '${character.name}' already exists.`
+        );
       }
       validateCharacterConfig(character);
       await db.CharacterConfig.create({
@@ -153,11 +156,10 @@ function createApiRouter(agents, directClient) {
     }
     const agentResult = await directClient.startAgent(character);
     elizaLogger.log(`${character.name} started`);
-    res.json({
-      id: character.id,
+    res.status(201).json({
+      id: agentResult.agentId,
       character,
-      agentResult,
-    });
+    })
   });
 
   router.get("/agents/:agentId/:roomId/memories", async (req, res) => {
