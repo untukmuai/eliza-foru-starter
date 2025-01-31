@@ -6,14 +6,12 @@ import {
   elizaLogger as elizaLogger2,
   generateCaption,
   generateImage,
-  getEmbeddingZeroVector
+  getEmbeddingZeroVector,
 } from "@elizaos/core";
 import { composeContext } from "@elizaos/core";
 import { generateMessageResponse } from "@elizaos/core";
 import { messageCompletionFooter } from "@elizaos/core";
-import {
-  ModelClass
-} from "@elizaos/core";
+import { ModelClass } from "@elizaos/core";
 import { stringToUuid as stringToUuid2 } from "@elizaos/core";
 import { settings } from "@elizaos/core";
 
@@ -24,7 +22,7 @@ import cors from "cors";
 import {
   elizaLogger,
   getEnvVariable,
-  validateCharacterConfig
+  validateCharacterConfig,
 } from "@elizaos/core";
 import { REST, Routes } from "discord.js";
 import { stringToUuid } from "@elizaos/core";
@@ -47,7 +45,7 @@ function apiKeyMiddleware(req, res, next) {
 }
 
 function createApiRouter(agents, directClient) {
-  if (!getEnvVariable("API_KEY_DIRECT")){
+  if (!getEnvVariable("API_KEY_DIRECT")) {
     elizaLogger.error("API_KEY_DIRECT is not set in environment variables");
     process.exit(1);
   }
@@ -57,7 +55,7 @@ function createApiRouter(agents, directClient) {
   router.use(bodyParser.urlencoded({ extended: true }));
   router.use(
     express.json({
-      limit: getEnvVariable("EXPRESS_MAX_PAYLOAD") || "100kb"
+      limit: getEnvVariable("EXPRESS_MAX_PAYLOAD") || "100kb",
     })
   );
   router.get("/", (req, res) => {
@@ -68,7 +66,7 @@ function createApiRouter(agents, directClient) {
     const agentsList = Array.from(agents.values()).map((agent) => ({
       id: agent.agentId,
       name: agent.character.name,
-      clients: Object.keys(agent.clients)
+      clients: Object.keys(agent.clients),
     }));
     res.json({ agents: agentsList });
   });
@@ -81,41 +79,54 @@ function createApiRouter(agents, directClient) {
     }
     res.json({
       id: agent.agentId,
-      character: agent.character
+      character: agent.character,
     });
   });
 
   router.post("/agents/:agentId/set", async (req, res) => {
     const agentId = req.params.agentId;
-    console.log("agentId", agentId);
-    let agent = agents.get(agentId);
-    if (agent) {
-      agent.stop();
-      directClient.unregisterAgent(agent);
-    }
+    elizaLogger.debug(`Update character config: ${agentId}`);
+    let agent = await agents.get(agentId);
     const character = req.body;
     try {
-      validateCharacterConfig(character);
-      const characterConfig = await db.CharacterConfig.findOne({ where: { name: character.name } });
+      elizaLogger.debug(`Validate character config payload: ${character.name}`);
+      await validateCharacterConfig(character);
+      elizaLogger.debug(`Character config payload validated: ${character.name}`);
+      const characterConfig = await db.CharacterConfig.findOne({
+        where: { name: character.name },
+      });
       if (!characterConfig) {
         throw new Error(`CharacterConfig with name "${name}" not found.`);
       }
-      characterConfig.character = newCharacterData;
-      await characterConfig.save();
+      characterConfig.character = character;
+      characterConfig.updatedAt = new Date();
+      try {
+        console.log("Before save:", characterConfig);
+        await characterConfig.save();
+        console.log("CharacterConfig saved successfully.");
+      } catch (error) {
+        console.error("Error saving characterConfig:", error);
+      }
+      elizaLogger.info(`CharacterConfig updated: ${character.name}`);
+      elizaLogger.debug(`Stopping agent: ${character.name}`);
+      if (agent) {
+        agent.stop();
+        directClient.unregisterAgent(agent);
+      }
+      agent = await directClient.startAgent(character);
+      elizaLogger.log(`${character.name} started`);
+      res.json({
+        id: character.id,
+        character,
+      });
     } catch (e) {
       elizaLogger.error(`Error process character update: ${e}`);
       res.status(400).json({
         success: false,
-        message: e.message
+        message: e.message,
       });
       return;
     }
-    agent = await directClient.startAgent(character);
-    elizaLogger.log(`${character.name} started`);
-    res.json({
-      id: character.id,
-      character
-    });
   });
 
   router.post("/agents-create", async (req, res) => {
@@ -124,7 +135,7 @@ function createApiRouter(agents, directClient) {
       const characterConfig = await db.CharacterConfig.findOne({
         where: { name: character.name },
       });
-      if (characterConfig){
+      if (characterConfig) {
         throw new Error(`CharacterConfig with name "${name}" already exists.`);
       }
       validateCharacterConfig(character);
@@ -140,12 +151,12 @@ function createApiRouter(agents, directClient) {
       });
       return;
     }
-    agent = await directClient.startAgent(character);
+    const agentResult = await directClient.startAgent(character);
     elizaLogger.log(`${character.name} started`);
     res.json({
       id: character.id,
       character,
-      agent,
+      agentResult,
     });
   });
 
@@ -164,7 +175,7 @@ function createApiRouter(agents, directClient) {
     }
     try {
       const memories = await runtime.messageManager.getMemories({
-        roomId
+        roomId,
       });
       console.log(memories);
       const response = {
@@ -181,23 +192,21 @@ function createApiRouter(agents, directClient) {
             source: memory.content.source,
             url: memory.content.url,
             inReplyTo: memory.content.inReplyTo,
-            attachments: memory.content.attachments?.map(
-              (attachment) => ({
-                id: attachment.id,
-                url: attachment.url,
-                title: attachment.title,
-                source: attachment.source,
-                description: attachment.description,
-                text: attachment.text,
-                contentType: attachment.contentType
-              })
-            )
+            attachments: memory.content.attachments?.map((attachment) => ({
+              id: attachment.id,
+              url: attachment.url,
+              title: attachment.title,
+              source: attachment.source,
+              description: attachment.description,
+              text: attachment.text,
+              contentType: attachment.contentType,
+            })),
           },
           embedding: memory.embedding,
           roomId: memory.roomId,
           unique: memory.unique,
-          similarity: memory.similarity
-        }))
+          similarity: memory.similarity,
+        })),
       };
       res.json(response);
     } catch (error) {
@@ -223,10 +232,10 @@ var storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
     cb(null, `${uniqueSuffix}-${file.originalname}`);
-  }
+  },
 });
 var upload = multer({ storage });
-var messageHandlerTemplate = (
+var messageHandlerTemplate =
   // {{goals}}
   `# Action Examples
 {{actionExamples}}
@@ -254,8 +263,7 @@ Note that {{agentName}} is capable of reading/seeing/hearing various forms of me
 {{actions}}
 
 # Instructions: Write the next message for {{agentName}}.
-` + messageCompletionFooter
-);
+` + messageCompletionFooter;
 var DirectClient = class {
   app;
   agents;
@@ -281,7 +289,7 @@ var DirectClient = class {
     );
     const apiRouter = createApiRouter(this.agents, this);
     this.app.use(apiRouter);
-    
+
     this.app.post(
       "/:agentId/message",
       upload.single("file"),
@@ -325,20 +333,20 @@ var DirectClient = class {
             source: "direct",
             description: `Uploaded file: ${req.file.originalname}`,
             text: "",
-            contentType: req.file.mimetype
+            contentType: req.file.mimetype,
           });
         }
         const content = {
           text,
           attachments,
           source: "direct",
-          inReplyTo: void 0
+          inReplyTo: void 0,
         };
         const userMessage = {
           content,
           userId,
           roomId,
-          agentId: runtime.agentId
+          agentId: runtime.agentId,
         };
         const memory = {
           id: stringToUuid2(messageId + "-" + userId),
@@ -347,26 +355,24 @@ var DirectClient = class {
           userId,
           roomId,
           content,
-          createdAt: Date.now()
+          createdAt: Date.now(),
         };
         await runtime.messageManager.addEmbeddingToMemory(memory);
         await runtime.messageManager.createMemory(memory);
         let state = await runtime.composeState(userMessage, {
-          agentName: runtime.character.name
+          agentName: runtime.character.name,
         });
         const context = composeContext({
           state,
-          template: messageHandlerTemplate
+          template: messageHandlerTemplate,
         });
         const response = await generateMessageResponse({
           runtime,
           context,
-          modelClass: ModelClass.LARGE
+          modelClass: ModelClass.LARGE,
         });
         if (!response) {
-          res.status(500).send(
-            "No response from generateMessageResponse"
-          );
+          res.status(500).send("No response from generateMessageResponse");
           return;
         }
         const responseMessage = {
@@ -375,7 +381,7 @@ var DirectClient = class {
           userId: runtime.agentId,
           content: response,
           embedding: getEmbeddingZeroVector(),
-          createdAt: Date.now()
+          createdAt: Date.now(),
         };
         await runtime.messageManager.createMemory(responseMessage);
         state = await runtime.updateRecentMessageState(state);
@@ -390,9 +396,7 @@ var DirectClient = class {
           }
         );
         await runtime.evaluate(memory, state);
-        const action = runtime.actions.find(
-          (a) => a.name === response.action
-        );
+        const action = runtime.actions.find((a) => a.name === response.action);
         const shouldSuppressInitialMessage = action?.suppressInitialMessage;
         if (!shouldSuppressInitialMessage) {
           if (message) {
@@ -409,32 +413,29 @@ var DirectClient = class {
         }
       }
     );
-    this.app.post(
-      "/:agentId/image",
-      async (req, res) => {
-        const agentId = req.params.agentId;
-        const agent = this.agents.get(agentId);
-        if (!agent) {
-          res.status(404).send("Agent not found");
-          return;
-        }
-        const images = await generateImage({ ...req.body }, agent);
-        const imagesRes = [];
-        if (images.data && images.data.length > 0) {
-          for (let i = 0; i < images.data.length; i++) {
-            const caption = await generateCaption(
-              { imageUrl: images.data[i] },
-              agent
-            );
-            imagesRes.push({
-              image: images.data[i],
-              caption: caption.title
-            });
-          }
-        }
-        res.json({ images: imagesRes });
+    this.app.post("/:agentId/image", async (req, res) => {
+      const agentId = req.params.agentId;
+      const agent = this.agents.get(agentId);
+      if (!agent) {
+        res.status(404).send("Agent not found");
+        return;
       }
-    );
+      const images = await generateImage({ ...req.body }, agent);
+      const imagesRes = [];
+      if (images.data && images.data.length > 0) {
+        for (let i = 0; i < images.data.length; i++) {
+          const caption = await generateCaption(
+            { imageUrl: images.data[i] },
+            agent
+          );
+          imagesRes.push({
+            image: images.data[i],
+            caption: caption.title,
+          });
+        }
+      }
+      res.json({ images: imagesRes });
+    });
   }
   // agent/src/index.ts:startAgent calls this
   registerAgent(runtime) {
@@ -485,12 +486,12 @@ var DirectClientInterface = {
     if (client instanceof DirectClient) {
       client.stop();
     }
-  }
+  },
 };
 var index_default = DirectClientInterface;
 export {
   DirectClient,
   DirectClientInterface,
   index_default as default,
-  messageHandlerTemplate
+  messageHandlerTemplate,
 };

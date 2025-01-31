@@ -35,7 +35,7 @@ export async function loadCharactersFromDB(): Promise<Character[]> {
     console.log(`Loaded ${result.length} characters from DB`);
     for (const character of result) {
       const characterData = character.get();
-      console.log(`Loaded character ${characterData.name}`);
+      console.log(`Loaded character ${JSON.stringify(characterData)}`);
       const characterConf = characterData.character;
       validateCharacterConfig(characterConf);
       loadedCharacters.push(characterConf);
