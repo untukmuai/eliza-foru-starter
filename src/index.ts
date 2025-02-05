@@ -2,6 +2,8 @@ import { DirectClient } from "./api/index.js";
 import {
   AgentRuntime,
   elizaLogger,
+  getEnvVariable,
+  ModelProviderName,
   settings,
   stringToUuid,
   type Character,
@@ -38,7 +40,7 @@ export function createAgent(
   elizaLogger.success(
     elizaLogger.successesTitle,
     "Creating runtime for character",
-    character.name,
+    character.name
   );
 
   nodePlugin ??= createNodePlugin();
@@ -89,7 +91,7 @@ async function startAgent(character: Character, directClient: DirectClient) {
   } catch (error) {
     elizaLogger.error(
       `Error starting agent for character ${character.name}:`,
-      error,
+      error
     );
     console.error(error);
     throw error;
@@ -122,11 +124,23 @@ const startAgents = async () => {
 
   let characters = [character];
 
-  console.log("loading characters from db");
-  characters.push(...(await loadCharactersFromDB()));
+  if (getEnvVariable("LOAD_CHARACTER_FROM_DB", "false") === "true") {
+    console.log("loading characters from db");
+    characters.push(...(await loadCharactersFromDB()));
+  } 
   console.log("characters", characters);
   try {
     for (const character of characters) {
+      character.modelProvider ??= ModelProviderName.OPENAI;
+      character.settings ??= {
+        modelConfig: {
+          temperature: 0.2,
+          max_response_length: 400,
+          frequency_penalty: 0.1,
+          presence_penalty: 0.1,
+        },
+        embeddingModel: "all-MiniLM-L6-v2",
+      };
       await startAgent(character, directClient as DirectClient);
     }
   } catch (error) {
@@ -151,7 +165,7 @@ const startAgents = async () => {
   }
 
   const isDaemonProcess = process.env.DAEMON_PROCESS === "true";
-  if(!isDaemonProcess) {
+  if (!isDaemonProcess) {
     elizaLogger.log("Chat started. Type 'exit' to quit.");
     const chat = startChat(characters);
     chat();
