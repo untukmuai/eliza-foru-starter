@@ -8,38 +8,21 @@ import { dirname } from "node:path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || "development";
-const configPath = path.join(__dirname, "..", "config", "config.json");
 
-async function loadConfig() {
-  try {
-    const data = fs.readFileSync(configPath, "utf8");
-    const config = JSON.parse(data);
-    const configForEnv = config[env];
-    console.log(configForEnv);
-    return configForEnv;
-  } catch (err) {
-    console.error("Failed to load config", err);
-    throw err;
-  }
+// Read connection URL from environment variable
+const postgresUrl = process.env.POSTGRES_URL;
+if (!postgresUrl) {
+  throw new Error("POSTGRES_URL environment variable not set");
 }
 
-const config = await loadConfig();
 const db: { [key: string]: any } = {};
 
 let sequelize: Sequelize;
 
-if (config.use_env_variable) {
-  sequelize = new Sequelize(process.env[config.use_env_variable], {
-    ...config,
-  logging: console.log
+sequelize = new Sequelize(postgresUrl, {
+  logging: console.log,
+  dialect: "postgres", // ensure you specify the dialect if needed
 });
-} else {
-  sequelize = new Sequelize(config.database, config.username, config.password, {
-    ...config,
-    logging: console.log,
-  });
-}
 
 // Load models asynchronously
 const modelFiles = fs.readdirSync(__dirname).filter((file) => {
