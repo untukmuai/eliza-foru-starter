@@ -60,4 +60,4 @@ COPY --from=builder /app/twitter_cookies.json /app/
 
 EXPOSE 3000
 # Set the command to run the application
-CMD ["pnpm", "start", "--non-interactive", "--character=/app/characters/masteruwu.character.json"]
+CMD ["pnpm", "start", "--non-interactive"]
