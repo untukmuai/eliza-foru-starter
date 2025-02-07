@@ -170,6 +170,7 @@ packages:
     peerDependencies:
       zod: ^3.0.0
 
+
   '@ai-sdk/mistral@1.1.4':
     resolution: {integrity: sha512-wcbJXQdkJD6n6FoSdDw1k8uePp7vrlOeIyDCC1+TP2v0drfiZQAHtHncEK7btisJ1S2KpBJQ3W5NEVGAcXmVtQ==}
     engines: {node: '>=18'}
@@ -747,6 +748,7 @@ packages:
 
   '@elizaos/core@0.1.8':
     resolution: {integrity: sha512-nQT5uQTQVTZJ3CrhVkK4dRdP/RuBMiOv/u3JZvMJGhY45z0Gy0gY27NEn/BBlJ4Ymt/SmqtXOul/x2hOeQen4Q==}
+
 
   '@elizaos/plugin-bootstrap@0.1.8':
     resolution: {integrity: sha512-CRfthg+6GOLYAy00M8RVROonOt6w47SM4PjHOKzxdmEAgQxH6gpsSC1Q6Cwad9fbW8zyYXDtOB3dybmZla+zsg==}
