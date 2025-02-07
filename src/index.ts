@@ -1,7 +1,9 @@
-import { DirectClient } from "@elizaos/client-direct";
+import { DirectClient } from "./api/index.js";
 import {
   AgentRuntime,
   elizaLogger,
+  getEnvVariable,
+  ModelProviderName,
   settings,
   stringToUuid,
   type Character,
@@ -9,23 +11,17 @@ import {
 import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
 import { createNodePlugin } from "@elizaos/plugin-node";
 import { solanaPlugin } from "@elizaos/plugin-solana";
-import fs from "fs";
 import net from "net";
-import path from "path";
-import { fileURLToPath } from "url";
 import { initializeDbCache } from "./cache/index.ts";
 import { character } from "./character.ts";
 import { startChat } from "./chat/index.ts";
 import { initializeClients } from "./clients/index.ts";
 import {
   getTokenForProvider,
-  loadCharacters,
+  loadCharactersFromDB,
   parseArguments,
 } from "./config/index.ts";
 import { initializeDatabase } from "./database/index.ts";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export const wait = (minTime: number = 1000, maxTime: number = 3000) => {
   const waitTime =
@@ -44,7 +40,7 @@ export function createAgent(
   elizaLogger.success(
     elizaLogger.successesTitle,
     "Creating runtime for character",
-    character.name,
+    character.name
   );
 
   nodePlugin ??= createNodePlugin();
@@ -74,13 +70,8 @@ async function startAgent(character: Character, directClient: DirectClient) {
     character.username ??= character.name;
 
     const token = getTokenForProvider(character.modelProvider, character);
-    const dataDir = path.join(__dirname, "../data");
 
-    if (!fs.existsSync(dataDir)) {
-      fs.mkdirSync(dataDir, { recursive: true });
-    }
-
-    const db = initializeDatabase(dataDir);
+    const db = initializeDatabase();
 
     await db.init();
 
@@ -100,7 +91,7 @@ async function startAgent(character: Character, directClient: DirectClient) {
   } catch (error) {
     elizaLogger.error(
       `Error starting agent for character ${character.name}:`,
-      error,
+      error
     );
     console.error(error);
     throw error;
@@ -131,16 +122,25 @@ const startAgents = async () => {
   let serverPort = parseInt(settings.SERVER_PORT || "3000");
   const args = parseArguments();
 
-  let charactersArg = args.characters || args.character;
   let characters = [character];
 
-  console.log("charactersArg", charactersArg);
-  if (charactersArg) {
-    characters = await loadCharacters(charactersArg);
-  }
+  if (getEnvVariable("LOAD_CHARACTER_FROM_DB", "false") === "true") {
+    console.log("loading characters from db");
+    characters.push(...(await loadCharactersFromDB()));
+  } 
   console.log("characters", characters);
   try {
     for (const character of characters) {
+      character.modelProvider ??= ModelProviderName.OPENAI;
+      character.settings ??= {
+        modelConfig: {
+          temperature: 0.2,
+          max_response_length: 400,
+          frequency_penalty: 0.1,
+          presence_penalty: 0.1,
+        },
+        embeddingModel: "all-MiniLM-L6-v2",
+      };
       await startAgent(character, directClient as DirectClient);
     }
   } catch (error) {
@@ -165,7 +165,7 @@ const startAgents = async () => {
   }
 
   const isDaemonProcess = process.env.DAEMON_PROCESS === "true";
-  if(!isDaemonProcess) {
+  if (!isDaemonProcess) {
     elizaLogger.log("Chat started. Type 'exit' to quit.");
     const chat = startChat(characters);
     chat();
