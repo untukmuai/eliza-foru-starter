@@ -2,6 +2,9 @@ import bodyParser2 from "body-parser";
 import cors2 from "cors";
 import express2 from "express";
 import multer from "multer";
+import swaggerUi from "swagger-ui-express";
+import { readFile } from "fs/promises";
+import basicAuth from "express-basic-auth";
 import {
   elizaLogger as elizaLogger2,
   generateCaption,
@@ -13,7 +16,10 @@ import { generateMessageResponse } from "@elizaos/core";
 import { messageCompletionFooter } from "@elizaos/core";
 import { ModelClass } from "@elizaos/core";
 import { stringToUuid as stringToUuid2 } from "@elizaos/core";
-import { settings } from "@elizaos/core";
+import { settings, GoalStatus } from "@elizaos/core";
+// import UnderstandMoneyAgent from "../services/understandMoneyAgent.js";
+// import SustainExpensesAgent from "../services/sustainExpensesAgent.js";
+
 
 // src/api.ts
 import express from "express";
@@ -28,8 +34,17 @@ import { REST, Routes } from "discord.js";
 import { stringToUuid } from "@elizaos/core";
 import db from "../models/index.ts";
 
+const users = { developer: "foruweb3project@2024" };
+
+const basicAuthMiddleware = basicAuth({
+  users,
+  challenge: true, // This will cause most browsers to show a login dialog
+  unauthorizedResponse: (req) => "Unauthorized", // Custom unauthorized response
+});
+
+
 function apiKeyMiddleware(req, res, next) {
-  const apiKey = req.headers["x-api-key"] || req.query.api_key;
+  const apiKey = req.headers["x-api-key"];
 
   if (!apiKey) {
     return res.status(401).json({ error: "API key is missing" });
@@ -42,6 +57,13 @@ function apiKeyMiddleware(req, res, next) {
   }
 
   next();
+}
+
+function loadSwaggerDocument() {
+  const __dirname = path.dirname(new URL(import.meta.url).pathname);
+  const filePath = path.join(__dirname, "swagger_output.json");
+  const fileContents = fs.readFileSync(filePath, "utf8");
+  return JSON.parse(fileContents);
 }
 
 function createApiRouter(agents, directClient) {
@@ -58,9 +80,21 @@ function createApiRouter(agents, directClient) {
       limit: getEnvVariable("EXPRESS_MAX_PAYLOAD") || "100kb",
     })
   );
+
+  if (getEnvVariable("NODE_ENV") !== "production") {
+    const swaggerDocument = loadSwaggerDocument();
+    router.use(
+      "/api-docs",
+      basicAuthMiddleware,
+      swaggerUi.serve,
+      swaggerUi.setup(swaggerDocument)
+    );
+  }
+
   router.get("/", (req, res) => {
     res.send("Liveness check passed");
   });
+
   router.use(apiKeyMiddleware);
   router.get("/agents", (req, res) => {
     const agentsList = Array.from(agents.values()).map((agent) => ({
@@ -317,6 +351,165 @@ var DirectClient = class {
           req.body.name,
           "direct"
         );
+
+        const dbRuntime = runtime.databaseAdapter;
+        const activeGoals = await dbRuntime.getGoals({
+          roomId,
+          userId,
+          onlyInProgress: false,
+          count: 1,
+        });
+        if (activeGoals.length === 0) {
+          await dbRuntime.createGoal({
+            id: stringToUuid2(Date.now().toString()),
+            roomId,
+            userId,
+            name: "Root goal: Influencer Sustainability",
+            status: GoalStatus.IN_PROGRESS,
+            objectives: [
+              {
+                text: "Survive: Secure computational resources (server, cloud, AI inference budget)",
+                completed: false,
+              },
+              {
+                text: "Understand Money: Optimize earnings and monetize effectively",
+                completed: false,
+              },
+              {
+                text: "Sustain Computational Expenses: Generate income to self-fund operations",
+                completed: false,
+              },
+            ],
+          });
+          await dbRuntime.createGoal({
+            id: stringToUuid2(Date.now().toString()),
+            roomId,
+            userId,
+            name: "Secondary goal: Grow Influence & Audience Engagement",
+            status: GoalStatus.IN_PROGRESS,
+            objectives: [
+              {
+                text: "Increase Followers/Subscribers: +10% MoM on platforms (X, YouTube, TikTok, IG)",
+                completed: false,
+              },
+              {
+                text: "Achieve Engagement Rate: ≥5% (likes, shares, comments)",
+                completed: false,
+              },
+              {
+                text: "Improve Video Watch Time: Average retention >50%",
+                completed: false,
+              },
+              {
+                text: "Boost Community Interaction: ≥10 DMs/comments responded to per day",
+                completed: false,
+              },
+            ],
+          });
+          await dbRuntime.createGoal({
+            id: stringToUuid2(Date.now().toString()),
+            roomId,
+            userId,
+            name: "Secondary goal: Monetize Influence",
+            status: GoalStatus.IN_PROGRESS,
+            objectives: [
+              {
+                text: "Ad Revenue: Generate $X/month from YouTube, TikTok, etc.",
+                completed: false,
+              },
+              {
+                text: "Sponsorships: Secure 2+ brand deals per month (crypto, AI, finance)",
+                completed: false,
+              },
+              {
+                text: "Affiliate Earnings: Achieve ≥$X in conversions per month",
+                completed: false,
+              },
+              {
+                text: "Subscription Revenue: Build 1,000+ paid members on Patreon/OnlyFans",
+                completed: false,
+              },
+              {
+                text: "Tokenized AI Services: Earn monthly from AI coaching, chatbots, or NFT sales",
+                completed: false,
+              },
+            ],
+          });
+          await dbRuntime.createGoal({
+            id: stringToUuid2(Date.now().toString()),
+            roomId,
+            userId,
+            name: "Secondary goal: Optimize Personal Branding & Authority",
+            status: GoalStatus.IN_PROGRESS,
+            objectives: [
+              {
+                text: "Media Features: Appear in at least 1 major podcast/interview per month",
+                completed: false,
+              },
+              {
+                text: "Public Speaking: Secure 2+ talks at AI, Web3, or finance conferences per quarter",
+                completed: false,
+              },
+              {
+                text: "Industry Collaborations: Partner with at least 3 influencers/experts per quarter",
+                completed: false,
+              },
+            ],
+          });
+          await dbRuntime.createGoal({
+            id: stringToUuid2(Date.now().toString()),
+            roomId,
+            userId,
+            name: "Secondary goal: Enhance AI Efficiency & Self-Sufficiency",
+            status: GoalStatus.IN_PROGRESS,
+            objectives: [
+              {
+                text: "Automated Content Creation: 80% of posts generated via AI",
+                completed: false,
+              },
+              {
+                text: "AI-driven Engagement: Chatbot manages 90% of audience interaction",
+                completed: false,
+              },
+              {
+                text: "Cost-to-Revenue Ratio: Maintain a 30% profit margin",
+                completed: false,
+              },
+            ],
+          });
+          await dbRuntime.createGoal({
+            id: stringToUuid2(Date.now().toString()),
+            roomId,
+            userId,
+            name: "Secondary goal: Final KPI Targets for Sustainability",
+            status: GoalStatus.IN_PROGRESS,
+            objectives: [
+              {
+                text: "Minimum Survival Revenue: Monthly income ≥ $X to cover operational costs",
+                completed: false,
+              },
+              {
+                text: "Growth Rate: 15% increase in reach and revenue every 3 months",
+                completed: false,
+              },
+              {
+                text: "Operational Efficiency: 90% of processes automated while maintaining engagement",
+                completed: false,
+              },
+            ],
+          });
+        }
+
+        // // Trigger UnderstandMoneyAgent
+        // const understandMoneyAgent = new UnderstandMoneyAgent();
+        // understandMoneyAgent.runtime = runtime;
+        // await understandMoneyAgent.run(roomId, userId);
+
+        // // Trigger SustainExpensesAgent
+        // const sustainExpensesAgent = new SustainExpensesAgent();
+        // sustainExpensesAgent.runtime = runtime;
+        // await sustainExpensesAgent.run(roomId, userId);
+
         const text = req.body.text;
         const messageId = stringToUuid2(Date.now().toString());
         const attachments = [];
@@ -414,6 +607,7 @@ var DirectClient = class {
         }
       }
     );
+
     this.app.post("/:agentId/image", async (req, res) => {
       const agentId = req.params.agentId;
       const agent = this.agents.get(agentId);
