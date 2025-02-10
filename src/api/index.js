@@ -2,6 +2,9 @@ import bodyParser2 from "body-parser";
 import cors2 from "cors";
 import express2 from "express";
 import multer from "multer";
+import swaggerUi from "swagger-ui-express";
+import { readFile } from "fs/promises";
+import basicAuth from "express-basic-auth";
 import {
   elizaLogger as elizaLogger2,
   generateCaption,
@@ -14,8 +17,8 @@ import { messageCompletionFooter } from "@elizaos/core";
 import { ModelClass } from "@elizaos/core";
 import { stringToUuid as stringToUuid2 } from "@elizaos/core";
 import { settings, GoalStatus } from "@elizaos/core";
-import UnderstandMoneyAgent from "../services/understandMoneyAgent.js";
-import SustainExpensesAgent from "../services/sustainExpensesAgent.js";
+// import UnderstandMoneyAgent from "../services/understandMoneyAgent.js";
+// import SustainExpensesAgent from "../services/sustainExpensesAgent.js";
 
 
 // src/api.ts
@@ -31,8 +34,17 @@ import { REST, Routes } from "discord.js";
 import { stringToUuid } from "@elizaos/core";
 import db from "../models/index.ts";
 
+const users = { developer: "foruweb3project@2024" };
+
+const basicAuthMiddleware = basicAuth({
+  users,
+  challenge: true, // This will cause most browsers to show a login dialog
+  unauthorizedResponse: (req) => "Unauthorized", // Custom unauthorized response
+});
+
+
 function apiKeyMiddleware(req, res, next) {
-  const apiKey = req.headers["x-api-key"] || req.query.api_key;
+  const apiKey = req.headers["x-api-key"];
 
   if (!apiKey) {
     return res.status(401).json({ error: "API key is missing" });
@@ -45,6 +57,13 @@ function apiKeyMiddleware(req, res, next) {
   }
 
   next();
+}
+
+function loadSwaggerDocument() {
+  const __dirname = path.dirname(new URL(import.meta.url).pathname);
+  const filePath = path.join(__dirname, "swagger_output.json");
+  const fileContents = fs.readFileSync(filePath, "utf8");
+  return JSON.parse(fileContents);
 }
 
 function createApiRouter(agents, directClient) {
@@ -61,9 +80,21 @@ function createApiRouter(agents, directClient) {
       limit: getEnvVariable("EXPRESS_MAX_PAYLOAD") || "100kb",
     })
   );
+
+  if (getEnvVariable("NODE_ENV") !== "production") {
+    const swaggerDocument = loadSwaggerDocument();
+    router.use(
+      "/api-docs",
+      basicAuthMiddleware,
+      swaggerUi.serve,
+      swaggerUi.setup(swaggerDocument)
+    );
+  }
+
   router.get("/", (req, res) => {
     res.send("Liveness check passed");
   });
+
   router.use(apiKeyMiddleware);
   router.get("/agents", (req, res) => {
     const agentsList = Array.from(agents.values()).map((agent) => ({
@@ -469,15 +500,15 @@ var DirectClient = class {
           });
         }
 
-        // Trigger UnderstandMoneyAgent
-        const understandMoneyAgent = new UnderstandMoneyAgent();
-        understandMoneyAgent.runtime = runtime;
-        await understandMoneyAgent.run(roomId, userId);
+        // // Trigger UnderstandMoneyAgent
+        // const understandMoneyAgent = new UnderstandMoneyAgent();
+        // understandMoneyAgent.runtime = runtime;
+        // await understandMoneyAgent.run(roomId, userId);
 
-        // Trigger SustainExpensesAgent
-        const sustainExpensesAgent = new SustainExpensesAgent();
-        sustainExpensesAgent.runtime = runtime;
-        await sustainExpensesAgent.run(roomId, userId);
+        // // Trigger SustainExpensesAgent
+        // const sustainExpensesAgent = new SustainExpensesAgent();
+        // sustainExpensesAgent.runtime = runtime;
+        // await sustainExpensesAgent.run(roomId, userId);
 
         const text = req.body.text;
         const messageId = stringToUuid2(Date.now().toString());

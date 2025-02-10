@@ -9,7 +9,8 @@
     "clean": "./scripts/clean.sh",
     "start:service:all": "pm2 start pnpm --name=\"all\" --restart-delay=3000 --max-restarts=10 -- run start:all",
     "stop:service:all": "pm2 stop all",
-    "migration": "sequelize-cli db:migrate --config src/config/config.json --migrations-path src/migrations --models-path src/models"
+    "migration": "sequelize-cli db:migrate --config src/config/config.json --migrations-path src/migrations --models-path src/models",
+    "swagger-autogen": "node src/api/swagger.js"
   },
   "dependencies": {
     "@elizaos/adapter-postgres": "0.1.8",
@@ -34,6 +35,7 @@
     "cors": "2.8.5",
     "discord.js": "14.16.3",
     "express": "4.21.1",
+    "express-basic-auth": "^1.2.1",
     "multer": "1.4.5-lts.1",
     "net": "1.0.2",
     "path": "^0.12.7",
@@ -41,6 +43,8 @@
     "pg-hstore": "^2.3.4",
     "readline": "1.3.0",
     "sequelize": "^6.37.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "uuid": "^11.0.5",
     "ws": "8.18.0",
     "yargs": "17.7.2"
@@ -58,6 +62,7 @@
     "@types/node": "^22.10.10",
     "@types/sequelize": "^4.28.20",
     "sequelize-cli": "^6.6.2",
+    "swagger-autogen": "^2.23.7",
     "ts-node": "10.9.2",
     "tsup": "8.3.5",
     "typescript": "5.6.3"
