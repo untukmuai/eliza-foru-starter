@@ -21,6 +21,87 @@
         }
       }
     },
+    "/personality-to-character": {
+      "post": {
+        "summary": "Generate a character profile from personality data",
+        "description": "Processes given agent data and returns a formatted character profile.",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API key required for authentication."
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "agent_name": {
+                    "type": "string",
+                    "example": "Eliza"
+                  },
+                  "agent_personality": {
+                    "type": "string",
+                    "example": "Friendly and helpful"
+                  },
+                  "traits": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["curious", "analytical", "empathetic"]
+                  },
+                  "tone_voice": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["formal", "professional"]
+                  },
+                  "community_name": {
+                    "type": "string",
+                    "example": "Tech Enthusiasts"
+                  },
+                  "community_description": {
+                    "type": "string",
+                    "example": "A community for discussing the latest technology trends."
+                  }
+                },
+                "required": [
+                  "agent_name",
+                  "agent_personality",
+                  "traits",
+                  "tone_voice",
+                  "community_name",
+                  "community_description"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request. Invalid input data."
+          },
+          "401": {
+            "description": "Unauthorized. Missing or invalid API key."
+          },
+          "500": {
+            "description": "Internal server error. Something went wrong while processing the request."
+          }
+        }
+      }
+    },
     "/agents": {
       "get": {
         "description": "",
