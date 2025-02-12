@@ -1,262 +1,22 @@
-import bodyParser2 from "body-parser";
-import cors2 from "cors";
-import express2 from "express";
-import multer from "multer";
-import swaggerUi from "swagger-ui-express";
-import { readFile } from "fs/promises";
-import basicAuth from "express-basic-auth";
-import {
-  elizaLogger as elizaLogger2,
-  generateCaption,
-  generateImage,
-  getEmbeddingZeroVector,
-} from "@elizaos/core";
-import { composeContext } from "@elizaos/core";
-import { generateMessageResponse } from "@elizaos/core";
-import { messageCompletionFooter } from "@elizaos/core";
-import { ModelClass } from "@elizaos/core";
-import { stringToUuid as stringToUuid2 } from "@elizaos/core";
-import { settings, GoalStatus } from "@elizaos/core";
-// import UnderstandMoneyAgent from "../services/understandMoneyAgent.js";
-// import SustainExpensesAgent from "../services/sustainExpensesAgent.js";
-
-
-// src/api.ts
+// controllers/messageController.js
 import express from "express";
-import bodyParser from "body-parser";
-import cors from "cors";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
 import {
-  elizaLogger,
-  getEnvVariable,
-  validateCharacterConfig,
+  stringToUuid,
+  composeContext,
+  generateMessageResponse,
+  messageCompletionFooter,
+  ModelClass,
+  getEmbeddingZeroVector,
+  GoalStatus,
 } from "@elizaos/core";
-import { REST, Routes } from "discord.js";
-import { stringToUuid } from "@elizaos/core";
-import db from "../models/index.ts";
+import { elizaLogger } from "@elizaos/core";
+import { stringToUuid as stringToUuid2 } from "@elizaos/core";
 
-const users = { developer: "foruweb3project@2024" };
-
-const basicAuthMiddleware = basicAuth({
-  users,
-  challenge: true, // This will cause most browsers to show a login dialog
-  unauthorizedResponse: (req) => "Unauthorized", // Custom unauthorized response
-});
-
-
-function apiKeyMiddleware(req, res, next) {
-  const apiKey = req.headers["x-api-key"];
-
-  if (!apiKey) {
-    return res.status(401).json({ error: "API key is missing" });
-  }
-
-  const validApiKey = getEnvVariable("API_KEY_DIRECT");
-
-  if (apiKey !== validApiKey) {
-    return res.status(401).json({ error: "Invalid API key" });
-  }
-
-  next();
-}
-
-function loadSwaggerDocument() {
-  const __dirname = path.dirname(new URL(import.meta.url).pathname);
-  const filePath = path.join(__dirname, "swagger_output.json");
-  const fileContents = fs.readFileSync(filePath, "utf8");
-  return JSON.parse(fileContents);
-}
-
-function createApiRouter(agents, directClient) {
-  if (!getEnvVariable("API_KEY_DIRECT")) {
-    elizaLogger.error("API_KEY_DIRECT is not set in environment variables");
-    process.exit(1);
-  }
-  const router = express.Router();
-  router.use(cors());
-  router.use(bodyParser.json());
-  router.use(bodyParser.urlencoded({ extended: true }));
-  router.use(
-    express.json({
-      limit: getEnvVariable("EXPRESS_MAX_PAYLOAD") || "100kb",
-    })
-  );
-
-  if (getEnvVariable("NODE_ENV") !== "production") {
-    const swaggerDocument = loadSwaggerDocument();
-    router.use(
-      "/api-docs",
-      basicAuthMiddleware,
-      swaggerUi.serve,
-      swaggerUi.setup(swaggerDocument)
-    );
-  }
-
-  router.get("/", (req, res) => {
-    res.send("Liveness check passed");
-  });
-
-  router.use(apiKeyMiddleware);
-  router.get("/agents", (req, res) => {
-    const agentsList = Array.from(agents.values()).map((agent) => ({
-      id: agent.agentId,
-      name: agent.character.name,
-      clients: Object.keys(agent.clients),
-    }));
-    res.json({ agents: agentsList });
-  });
-  router.get("/agents/:agentId", (req, res) => {
-    const agentId = req.params.agentId;
-    const agent = agents.get(agentId);
-    if (!agent) {
-      res.status(404).json({ error: "Agent not found" });
-      return;
-    }
-    res.json({
-      id: agent.agentId,
-      character: agent.character,
-    });
-  });
-
-  router.post("/agents/:agentId/set", async (req, res) => {
-    const agentId = req.params.agentId;
-    elizaLogger.debug(`Update character config: ${agentId}`);
-    let agent = await agents.get(agentId);
-    const character = req.body;
-    try {
-      elizaLogger.debug(`Validate character config payload: ${character.name}`);
-      await validateCharacterConfig(character);
-      elizaLogger.debug(
-        `Character config payload validated: ${character.name}`
-      );
-      const characterConfig = await db.CharacterConfig.findOne({
-        where: { name: character.name },
-      });
-      if (!characterConfig) {
-        throw new Error(
-          `CharacterConfig with name "${character.name}" not found.`
-        );
-      }
-      console.log("CharacterConfig found:", characterConfig);
-      await db.CharacterConfig.update(
-        { character: character, updatedAt: new Date() },
-        { where: { name: character.name } }
-      );
-      elizaLogger.info(`CharacterConfig updated: ${character.name}`);
-      elizaLogger.debug(`Stopping agent: ${character.name}`);
-      if (agent) {
-        agent.stop();
-        directClient.unregisterAgent(agent);
-      }
-      agent = await directClient.startAgent(character);
-      elizaLogger.log(`${character.name} started`);
-      res.json({
-        id: character.id,
-        character,
-      });
-    } catch (e) {
-      elizaLogger.error(`Error process character update: ${e}`);
-      res.status(400).json({
-        success: false,
-        message: e.message,
-      });
-      return;
-    }
-  });
-
-  router.post("/agents-create", async (req, res) => {
-    const character = req.body;
-    try {
-      const characterConfig = await db.CharacterConfig.findOne({
-        where: { name: character.name },
-      });
-      if (characterConfig) {
-        throw new Error(
-          `CharacterConfig with name '${character.name}' already exists.`
-        );
-      }
-      validateCharacterConfig(character);
-      await db.CharacterConfig.create({
-        name: character.name,
-        character: character,
-      });
-    } catch (e) {
-      elizaLogger.error(`Error process create character: ${e}`);
-      res.status(400).json({
-        success: false,
-        message: e.message,
-      });
-      return;
-    }
-    const agentResult = await directClient.startAgent(character);
-    elizaLogger.log(`${character.name} started`);
-    res.status(201).json({
-      id: agentResult.agentId,
-      character,
-    });
-  });
-
-  router.get("/agents/:agentId/:roomId/memories", async (req, res) => {
-    const agentId = req.params.agentId;
-    const roomId = stringToUuid(req.params.roomId);
-    let runtime = agents.get(agentId);
-    if (!runtime) {
-      runtime = Array.from(agents.values()).find(
-        (a) => a.character.name.toLowerCase() === agentId.toLowerCase()
-      );
-    }
-    if (!runtime) {
-      res.status(404).send("Agent not found");
-      return;
-    }
-    try {
-      const memories = await runtime.messageManager.getMemories({
-        roomId,
-      });
-      console.log(memories);
-      const response = {
-        agentId,
-        roomId,
-        memories: memories.map((memory) => ({
-          id: memory.id,
-          userId: memory.userId,
-          agentId: memory.agentId,
-          createdAt: memory.createdAt,
-          content: {
-            text: memory.content.text,
-            action: memory.content.action,
-            source: memory.content.source,
-            url: memory.content.url,
-            inReplyTo: memory.content.inReplyTo,
-            attachments: memory.content.attachments?.map((attachment) => ({
-              id: attachment.id,
-              url: attachment.url,
-              title: attachment.title,
-              source: attachment.source,
-              description: attachment.description,
-              text: attachment.text,
-              contentType: attachment.contentType,
-            })),
-          },
-          embedding: memory.embedding,
-          roomId: memory.roomId,
-          unique: memory.unique,
-          similarity: memory.similarity,
-        })),
-      };
-      res.json(response);
-    } catch (error) {
-      console.error("Error fetching memories:", error);
-      res.status(500).json({ error: "Failed to fetch memories" });
-    }
-  });
-  return router;
-}
-
-// src/index.ts
-import * as fs from "fs";
-import * as path from "path";
-import { where } from "sequelize";
-var storage = multer.diskStorage({
+// Configure multer storage for file uploads
+const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const uploadDir = path.join(process.cwd(), "data", "uploads");
     if (!fs.existsSync(uploadDir)) {
@@ -269,7 +29,9 @@ var storage = multer.diskStorage({
     cb(null, `${uniqueSuffix}-${file.originalname}`);
   },
 });
-var upload = multer({ storage });
+
+const upload = multer({ storage });
+
 var messageHandlerTemplate =
   `# Action Examples
 {{actionExamples}}
@@ -334,44 +96,19 @@ Note that {{agentName}} is capable of reading/seeing/hearing various forms of me
 
 # Instructions: Write the next message for {{agentName}}.
 ` + messageCompletionFooter;
-var DirectClient = class {
-  app;
-  agents;
-  // container management
-  server;
-  // Store server instance
-  startAgent;
-  // Store startAgent functor
-  constructor() {
-    elizaLogger2.log("DirectClient constructor");
-    this.app = express2();
-    this.app.use(cors2());
-    this.agents = /* @__PURE__ */ new Map();
-    this.app.use(bodyParser2.json());
-    this.app.use(bodyParser2.urlencoded({ extended: true }));
-    this.app.use(
-      "/media/uploads",
-      express2.static(path.join(process.cwd(), "/data/uploads"))
-    );
-    this.app.use(
-      "/media/generated",
-      express2.static(path.join(process.cwd(), "/generatedImages"))
-    );
-    const apiRouter = createApiRouter(this.agents, this);
-    this.app.use(apiRouter);
 
-    this.app.post(
-      "/:agentId/message",
-      upload.single("file"),
-      async (req, res) => {
-        const agentId = req.params.agentId;
+const router = express.Router();
+
+const messageRoutes = (agents: Map<any, any>, directClient, messageHandlerTemplate) => {
+  router.post("/:agentId/message", upload.single("file"), async (req, res) => {
+            const agentId = req.params.agentId;
         const roomId = stringToUuid2(
           req.body.roomId ?? "default-room-" + agentId
         );
         const userId = stringToUuid2(req.body.userId ?? "user");
-        let runtime = this.agents.get(agentId);
+        let runtime = agents.get(agentId);
         if (!runtime) {
-          runtime = Array.from(this.agents.values()).find(
+          runtime = Array.from(agents.values()).find(
             (a) => a.character.name.toLowerCase() === agentId.toLowerCase()
           );
         }
@@ -642,88 +379,10 @@ var DirectClient = class {
             res.json([]);
           }
         }
-      }
-    );
+      
+  });
 
-    this.app.post("/:agentId/image", async (req, res) => {
-      const agentId = req.params.agentId;
-      const agent = this.agents.get(agentId);
-      if (!agent) {
-        res.status(404).send("Agent not found");
-        return;
-      }
-      const images = await generateImage({ ...req.body }, agent);
-      const imagesRes = [];
-      if (images.data && images.data.length > 0) {
-        for (let i = 0; i < images.data.length; i++) {
-          const caption = await generateCaption(
-            { imageUrl: images.data[i] },
-            agent
-          );
-          imagesRes.push({
-            image: images.data[i],
-            caption: caption.title,
-          });
-        }
-      }
-      res.json({ images: imagesRes });
-    });
-  }
-  // agent/src/index.ts:startAgent calls this
-  registerAgent(runtime) {
-    this.agents.set(runtime.agentId, runtime);
-  }
-  unregisterAgent(runtime) {
-    this.agents.delete(runtime.agentId);
-  }
-  start(port) {
-    this.server = this.app.listen(port, () => {
-      elizaLogger2.success(
-        `REST API bound to 0.0.0.0:${port}. If running locally, access it at http://localhost:${port}.`
-      );
-    });
-    const gracefulShutdown = () => {
-      elizaLogger2.log("Received shutdown signal, closing server...");
-      this.server.close(() => {
-        elizaLogger2.success("Server closed successfully");
-        process.exit(0);
-      });
-      setTimeout(() => {
-        elizaLogger2.error(
-          "Could not close connections in time, forcefully shutting down"
-        );
-        process.exit(1);
-      }, 5e3);
-    };
-    process.on("SIGTERM", gracefulShutdown);
-    process.on("SIGINT", gracefulShutdown);
-  }
-  stop() {
-    if (this.server) {
-      this.server.close(() => {
-        elizaLogger2.success("Server stopped");
-      });
-    }
-  }
-};
-var DirectClientInterface = {
-  start: async (_runtime) => {
-    elizaLogger2.log("DirectClientInterface start");
-    const client = new DirectClient();
-    const serverPort = parseInt(settings.SERVER_PORT || "3000");
-    client.start(serverPort);
-    return client;
-  },
-  stop: async (_runtime, client) => {
-    if (client instanceof DirectClient) {
-      client.stop();
-    }
-  },
-};
-var index_default = DirectClientInterface;
-export {
-  DirectClient,
-  DirectClientInterface,
-  index_default as default,
-  messageHandlerTemplate,
-};
+  return router;
+}
+
+export { messageRoutes, messageHandlerTemplate };

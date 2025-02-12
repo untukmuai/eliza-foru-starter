@@ -1,4 +1,4 @@
-import { DirectClient } from "./api/index.js";
+
 import {
   AgentRuntime,
   elizaLogger,
@@ -22,6 +22,7 @@ import {
   parseArguments,
 } from "./config/index.ts";
 import { initializeDatabase } from "./database/index.ts";
+import DirectApi from "./api/DirectApi.ts";
 
 export const wait = (minTime: number = 1000, maxTime: number = 3000) => {
   const waitTime =
@@ -65,7 +66,7 @@ export function createAgent(
   });
 }
 
-async function startAgent(character: Character, directClient: DirectClient) {
+async function startAgent(character: Character, directApi: DirectApi) {
   try {
     character.id ??= stringToUuid(character.name);
     character.username ??= character.name;
@@ -83,7 +84,7 @@ async function startAgent(character: Character, directClient: DirectClient) {
 
     runtime.clients = await initializeClients(character, runtime);
 
-    directClient.registerAgent(runtime);
+    directApi.registerAgent(runtime);
 
     // report to console
     elizaLogger.debug(`Started ${character.name} as ${runtime.agentId}`);
@@ -119,7 +120,7 @@ const checkPortAvailable = (port: number): Promise<boolean> => {
 };
 
 const startAgents = async () => {
-  const directClient = new DirectClient();
+  const directApi = new DirectApi();
   let serverPort = parseInt(settings.SERVER_PORT || "3000");
 
   let characters = [character];
@@ -141,7 +142,7 @@ const startAgents = async () => {
         },
         embeddingModel: "all-MiniLM-L6-v2",
       };
-      await startAgent(character, directClient as DirectClient);
+      await startAgent(character, directApi as DirectApi);
     }
   } catch (error) {
     elizaLogger.error("Error starting agents:", error);
@@ -152,13 +153,11 @@ const startAgents = async () => {
     serverPort++;
   }
 
-  // upload some agent functionality into directClient
-  directClient.startAgent = async (character: Character) => {
-    // wrap it so we don't have to inject directClient later
-    return startAgent(character, directClient);
+  directApi.startAgent = async (character: Character) => {
+    return startAgent(character, directApi);
   };
 
-  directClient.start(serverPort);
+  directApi.start(serverPort);
 
   if (serverPort !== parseInt(settings.SERVER_PORT || "3000")) {
     elizaLogger.log(`Server started on alternate port ${serverPort}`);

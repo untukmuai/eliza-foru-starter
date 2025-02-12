@@ -10,7 +10,7 @@
     "start:service:all": "pm2 start pnpm --name=\"all\" --restart-delay=3000 --max-restarts=10 -- run start:all",
     "stop:service:all": "pm2 stop all",
     "migration": "sequelize-cli db:migrate --config src/config/database.js --migrations-path src/migrations --models-path src/models",
-    "swagger-autogen": "node src/api/swagger.js"
+    "swagger": "node src/api/swagger.js"
   },
   "dependencies": {
     "@elizaos/adapter-postgres": "0.1.9",
