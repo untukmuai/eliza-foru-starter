@@ -118,9 +118,9 @@ function createApiRouter(agents, directClient) {
         given an agent data that will be created inside a community in a json format we have
         
         Agent Name: ${theContent.agent_name}
-        Personality: ${theContent.agent_personality}
+        Personality: ${theContent.personality}
         Agent's Traits: ${theContent.traits.join(' ')}
-        Agent's Tone of Voice: ${theContent.tone_voice.join(' ')}
+        Agent's Tone of Voice: ${theContent.tone_of_voice.join(' ')}
         Community Name: ${theContent.community_name}
         Community Description: ${theContent.community_description}
         
@@ -619,6 +619,10 @@ var DirectClient = class {
           state,
           template: messageHandlerTemplate,
         });
+        console.log("runtime")
+        console.log(runtime)
+        console.log("contEExt")
+        console.log(context)
         const response = await generateMessageResponse({
           runtime,
           context,

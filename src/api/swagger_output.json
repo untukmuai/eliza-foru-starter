@@ -47,7 +47,7 @@
                     "type": "string",
                     "example": "Eliza"
                   },
-                  "agent_personality": {
+                  "personality": {
                     "type": "string",
                     "example": "Friendly and helpful"
                   },
@@ -58,7 +58,7 @@
                     },
                     "example": ["curious", "analytical", "empathetic"]
                   },
-                  "tone_voice": {
+                  "tone_of_voice": {
                     "type": "array",
                     "items": {
                       "type": "string"
@@ -76,9 +76,9 @@
                 },
                 "required": [
                   "agent_name",
-                  "agent_personality",
+                  "personality",
                   "traits",
-                  "tone_voice",
+                  "tone_of_voice",
                   "community_name",
                   "community_description"
                 ]
