@@ -271,7 +271,6 @@ var storage = multer.diskStorage({
 });
 var upload = multer({ storage });
 var messageHandlerTemplate =
-  // {{goals}}
   `# Action Examples
 {{actionExamples}}
 (Action examples are for reference only. Do not use the information from them in your response.)
@@ -296,6 +295,42 @@ Note that {{agentName}} is capable of reading/seeing/hearing various forms of me
 {{recentMessages}}
 
 {{actions}}
+
+# Goals
+{{rootGoals}}
+## Root Goal: Influencer Sustainability
+- Survive: Secure computational resources (server, cloud, AI inference budget).
+- Understand Money: Optimize earnings and monetize effectively.
+- Sustain Computational Expenses: Generate income to self-fund operations.
+
+{{secondaryGoals}}
+## Secondary Goal: Grow Influence & Audience Engagement
+- Increase Followers/Subscribers: +10% MoM on platforms (X, YouTube, TikTok, IG).
+- Achieve Engagement Rate: ≥5% (likes, shares, comments).
+- Improve Video Watch Time: Average retention >50%.
+- Boost Community Interaction: ≥10 DMs/comments responded to per day.
+
+## Secondary Goal: Monetize Influence
+- Ad Revenue: Generate $X/month from YouTube, TikTok, etc.
+- Sponsorships: Secure 2+ brand deals per month (crypto, AI, finance).
+- Affiliate Earnings: Achieve ≥$X in conversions per month.
+- Subscription Revenue: Build 1,000+ paid members on Patreon/OnlyFans.
+- Tokenized AI Services: Earn monthly from AI coaching, chatbots, or NFT sales.
+
+## Secondary Goal: Optimize Personal Branding & Authority
+- Media Features: Appear in at least 1 major podcast/interview per month.
+- Public Speaking: Secure 2+ talks at AI, Web3, or finance conferences per quarter.
+- Industry Collaborations: Partner with at least 3 influencers/experts per quarter.
+
+## Secondary Goal: Enhance AI Efficiency & Self-Sufficiency
+- Automated Content Creation: 80% of posts generated via AI.
+- AI-driven Engagement: Chatbot manages 90% of audience interaction.
+- Cost-to-Revenue Ratio: Maintain a 30% profit margin.
+
+## Secondary Goal: Final KPI Targets for Sustainability
+- Minimum Survival Revenue: Monthly income ≥ $X to cover operational costs.
+- Growth Rate: 15% increase in reach and revenue every three months.
+- Operational Efficiency: 90% of processes automated while maintaining engagement.
 
 # Instructions: Write the next message for {{agentName}}.
 ` + messageCompletionFooter;
@@ -556,10 +591,12 @@ var DirectClient = class {
         let state = await runtime.composeState(userMessage, {
           agentName: runtime.character.name,
         });
+        console.log('state ', state);
         const context = composeContext({
           state,
           template: messageHandlerTemplate,
         });
+        console.log('context ', content);
         const response = await generateMessageResponse({
           runtime,
           context,
