@@ -328,12 +328,11 @@ const messageRoutes = (agents: Map<any, any>, directClient, messageHandlerTempla
         let state = await runtime.composeState(userMessage, {
           agentName: runtime.character.name,
         });
-        console.log('state ', state);
+        elizaLogger.debug("State messages : ", state);
         const context = composeContext({
           state,
           template: messageHandlerTemplate,
         });
-        console.log('context ', content);
         const response = await generateMessageResponse({
           runtime,
           context,
