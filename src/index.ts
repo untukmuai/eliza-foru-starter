@@ -61,6 +61,7 @@ export function createAgent(
     services: [],
     managers: [],
     cacheManager: cache,
+    conversationLength: 32,
   });
 }
 

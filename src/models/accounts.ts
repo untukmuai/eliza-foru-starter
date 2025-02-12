@@ -1,5 +1,4 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
-import { v4 as uuidv4 } from "uuid";
 
 export default function (sequelize: Sequelize) {
   class Accounts extends Model {
