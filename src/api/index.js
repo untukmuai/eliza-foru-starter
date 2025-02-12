@@ -131,7 +131,7 @@ function createApiRouter(agents, directClient) {
         `
         }
       ],
-      model: "gpt-4o"
+      model: "gpt-4o-mini"
     });
     const responseText = chatCompletion.choices[0].message.content;
     const mainResult = JSON.parse(responseText);
