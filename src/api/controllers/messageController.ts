@@ -108,7 +108,120 @@ const messageRoutes = (
         `Primary Goal Config not found for agent ${runtime.agentId}`
       );
     }
+    
+    await autoCreateGoalsDummy(dbRuntime, roomId, userId);
 
+    const secondaryGoalList = await dbRuntime.getGoals({
+      roomId,
+      userId,
+    });
+
+    const primaryGoals: string = formatPrimaryGoal(
+      agentConfig.dataValues.config_value
+    );
+    const secondaryGoals: string = convertGoalsListToString(secondaryGoalList);
+
+    const text = req.body.text;
+    const messageId = stringToUuid2(Date.now().toString());
+    const attachments = [];
+    if (req.file) {
+      const filePath = path.join(
+        process.cwd(),
+        "data",
+        "uploads",
+        req.file.filename
+      );
+      attachments.push({
+        id: Date.now().toString(),
+        url: filePath,
+        title: req.file.originalname,
+        source: "direct",
+        description: `Uploaded file: ${req.file.originalname}`,
+        text: "",
+        contentType: req.file.mimetype,
+      });
+    }
+    const content = {
+      text,
+      attachments,
+      source: "direct",
+      inReplyTo: void 0,
+    };
+    const userMessage = {
+      content,
+      userId,
+      roomId,
+      agentId: runtime.agentId,
+    };
+    const memory = {
+      id: stringToUuid2(messageId + "-" + userId),
+      ...userMessage,
+      agentId: runtime.agentId,
+      userId,
+      roomId,
+      content,
+      createdAt: Date.now(),
+    };
+    await runtime.messageManager.addEmbeddingToMemory(memory);
+    await runtime.messageManager.createMemory(memory);
+    let state = await runtime.composeState(userMessage, {
+      agentName: runtime.character.name,
+      primaryGoals,
+      secondaryGoals,
+    });
+    elizaLogger.debug("State messages : ", state);
+    const context = composeContext({
+      state,
+      template: messageHandlerTemplate,
+    });
+    const response = await generateMessageResponse({
+      runtime,
+      context,
+      modelClass: ModelClass.SMALL,
+    });
+    if (!response) {
+      res.status(500).send("No response from generateMessageResponse");
+      return;
+    }
+    const responseMessage = {
+      id: stringToUuid2(messageId + "-" + runtime.agentId),
+      ...userMessage,
+      userId: runtime.agentId,
+      content: response,
+      embedding: getEmbeddingZeroVector(),
+      createdAt: Date.now(),
+    };
+    await runtime.messageManager.createMemory(responseMessage);
+    state = await runtime.updateRecentMessageState(state);
+    let message = null;
+    await runtime.processActions(
+      memory,
+      [responseMessage],
+      state,
+      async (newMessages) => {
+        message = newMessages;
+        return [memory];
+      }
+    );
+    await runtime.evaluate(memory, state);
+    const action = runtime.actions.find((a) => a.name === response.action);
+    const shouldSuppressInitialMessage = action?.suppressInitialMessage;
+    if (!shouldSuppressInitialMessage) {
+      if (message) {
+        res.json([response, message]);
+      } else {
+        res.json([response]);
+      }
+    } else {
+      if (message) {
+        res.json([message]);
+      } else {
+        res.json([]);
+      }
+    }
+  });
+
+  async function autoCreateGoalsDummy(dbRuntime, roomId, userId) {
     const activeGoals = await dbRuntime.getGoals({
       roomId,
       userId,
@@ -234,116 +347,7 @@ const messageRoutes = (
         ],
       });
     }
-
-    const secondaryGoalList = await dbRuntime.getGoals({
-      roomId,
-      userId,
-    });
-
-    const primaryGoals: string = formatPrimaryGoal(
-      agentConfig.dataValues.config_value
-    );
-    const secondaryGoals: string = convertGoalsListToString(secondaryGoalList);
-
-    const text = req.body.text;
-    const messageId = stringToUuid2(Date.now().toString());
-    const attachments = [];
-    if (req.file) {
-      const filePath = path.join(
-        process.cwd(),
-        "data",
-        "uploads",
-        req.file.filename
-      );
-      attachments.push({
-        id: Date.now().toString(),
-        url: filePath,
-        title: req.file.originalname,
-        source: "direct",
-        description: `Uploaded file: ${req.file.originalname}`,
-        text: "",
-        contentType: req.file.mimetype,
-      });
-    }
-    const content = {
-      text,
-      attachments,
-      source: "direct",
-      inReplyTo: void 0,
-    };
-    const userMessage = {
-      content,
-      userId,
-      roomId,
-      agentId: runtime.agentId,
-    };
-    const memory = {
-      id: stringToUuid2(messageId + "-" + userId),
-      ...userMessage,
-      agentId: runtime.agentId,
-      userId,
-      roomId,
-      content,
-      createdAt: Date.now(),
-    };
-    await runtime.messageManager.addEmbeddingToMemory(memory);
-    await runtime.messageManager.createMemory(memory);
-    let state = await runtime.composeState(userMessage, {
-      agentName: runtime.character.name,
-      primaryGoals,
-      secondaryGoals,
-    });
-    elizaLogger.debug("State messages : ", state);
-    const context = composeContext({
-      state,
-      template: messageHandlerTemplate,
-    });
-    const response = await generateMessageResponse({
-      runtime,
-      context,
-      modelClass: ModelClass.LARGE,
-    });
-    if (!response) {
-      res.status(500).send("No response from generateMessageResponse");
-      return;
-    }
-    const responseMessage = {
-      id: stringToUuid2(messageId + "-" + runtime.agentId),
-      ...userMessage,
-      userId: runtime.agentId,
-      content: response,
-      embedding: getEmbeddingZeroVector(),
-      createdAt: Date.now(),
-    };
-    await runtime.messageManager.createMemory(responseMessage);
-    state = await runtime.updateRecentMessageState(state);
-    let message = null;
-    await runtime.processActions(
-      memory,
-      [responseMessage],
-      state,
-      async (newMessages) => {
-        message = newMessages;
-        return [memory];
-      }
-    );
-    await runtime.evaluate(memory, state);
-    const action = runtime.actions.find((a) => a.name === response.action);
-    const shouldSuppressInitialMessage = action?.suppressInitialMessage;
-    if (!shouldSuppressInitialMessage) {
-      if (message) {
-        res.json([response, message]);
-      } else {
-        res.json([response]);
-      }
-    } else {
-      if (message) {
-        res.json([message]);
-      } else {
-        res.json([]);
-      }
-    }
-  });
+  }
 
   return router;
 };
