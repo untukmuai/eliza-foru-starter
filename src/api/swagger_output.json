@@ -151,27 +151,86 @@
     },
     "/agents-create": {
       "post": {
-        "description": "",
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "400": {
-            "description": "Bad Request"
+        "summary": "Generate a character profile from personality data",
+        "description": "Processes given agent data and returns a formatted character profile.",
+        "parameters": [
+          {
+            "name": "x-api-key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "API key required for authentication."
           }
-        },
+        ],
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": {
-                    "example": "any"
+                  "agent_name": {
+                    "type": "string",
+                    "example": "Alvin's Hyrox Tech Agent"
+                  },
+                  "agent_personality": {
+                    "type": "string",
+                    "example": "Friendly and helpful"
+                  },
+                  "traits": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["curious", "analytical", "empathetic"]
+                  },
+                  "tone_voice": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["formal", "professional"]
+                  },
+                  "community_name": {
+                    "type": "string",
+                    "example": "Tech Enthusiasts"
+                  },
+                  "community_description": {
+                    "type": "string",
+                    "example": "A community for discussing the latest technology trends."
+                  },
+                  "goals": {
+                    "type": "string",
+                    "example": "5-10 goals e.g. 1. Expand HYROX Athlete Community Engagement \n - Target: 10% increase in interactions per month \n - Priority: High \n 2. Grow Social Media & Content Reach \n - Target: +5,000 new followers in 3 months \n - Priority: High"
                   }
-                }
+                },
+                "required": [
+                  "agent_name",
+                  "agent_personality",
+                  "traits",
+                  "tone_voice",
+                  "community_name",
+                  "community_description",
+                  "goals"
+                ]
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request. Invalid input data."
+          },
+          "401": {
+            "description": "Unauthorized. Missing or invalid API key."
+          },
+          "500": {
+            "description": "Internal server error. Something went wrong while processing the request."
           }
         }
       }
