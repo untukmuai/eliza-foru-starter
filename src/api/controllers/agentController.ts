@@ -155,11 +155,11 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
   // POST /agents-create — create a new agent
   router.post("/agents-create", async (req, res) => {
     try {
-      const { unprocessedGoals, ...unprocessedCharacter } = req.body;
+      const { goals, ...unprocessedCharacter } = req.body;
 
       const [character, elizaGoals] = await Promise.all([
         personalityToCharacter(unprocessedCharacter),
-        goalsToElizaGoals(unprocessedGoals)
+        goalsToElizaGoals(goals)
       ]);
       
       const characterConfig = await db.CharacterConfig.findOne({
@@ -182,7 +182,7 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       await db.AgentConfig.create({
         agent_id: agentResult.agentId,
         config_key: GoalType.SECONDARY,
-        config_value: JSON.stringify(elizaGoals)
+        config_value: elizaGoals,
       });
 
       elizaLogger.log(`${character.name} secondary goals inserted`);
