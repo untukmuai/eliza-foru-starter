@@ -5,7 +5,6 @@ import { stringToUuid } from "@elizaos/core";
 import { GoalType } from "../../database/enum-database.js";
 import { readFile } from "fs/promises";
 import OpenAI from 'openai'
-import { character } from "../../character.js";
 
 const client = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"],
@@ -183,7 +182,7 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       await db.AgentConfig.create({
         agent_id: agentResult.agentId,
         config_key: GoalType.SECONDARY,
-        config_value: elizaGoals
+        config_value: JSON.stringify(elizaGoals)
       });
 
       elizaLogger.log(`${character.name} secondary goals inserted`);
