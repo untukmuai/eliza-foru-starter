@@ -2,6 +2,7 @@ import express from "express";
 import { elizaLogger, validateCharacterConfig } from "@elizaos/core";
 import db from "../../models/index.js";
 import { stringToUuid } from "@elizaos/core";
+import { GoalType } from "../../database/enum-database.js";
 
 const router = express.Router();
 
@@ -92,6 +93,14 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
         name: character.name,
         character,
       });
+      // TODO: Create AgentConfig records for secondary goals from LLM
+      // await db.AgentConfig.create({
+      //   agent_id: character.id,
+      //   config_key: GoalType.SECONDARY,
+      //   config_value: [
+
+      //   ],
+      // });
     } catch (e) {
       elizaLogger.error(`Error processing create character: ${e}`);
       res.status(400).json({
