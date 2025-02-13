@@ -10,7 +10,6 @@ export const character: Character = {
   name: "masteruwu",
   clients: [
     Clients.DIRECT,
-    Clients.TELEGRAM,
   ],
   modelProvider: ModelProviderName.OPENAI,
   settings: {
