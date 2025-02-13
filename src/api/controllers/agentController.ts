@@ -159,8 +159,8 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       const { unprocessedGoals, ...unprocessedCharacter } = req.body;
 
       const [character, elizaGoals] = await Promise.all([
-        personalityToCharacter(unprocessedCharacter);
-        goalsToElizaGoals(unprocessedGoals);
+        personalityToCharacter(unprocessedCharacter),
+        goalsToElizaGoals(unprocessedGoals)
       ]);
       
       const characterConfig = await db.CharacterConfig.findOne({
@@ -187,7 +187,7 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       });
 
       elizaLogger.log(`${character.name} secondary goals inserted`);
-      res.json(201).json({ id: agentResult.agentID, character });
+      res.status(201).json({ id: agentResult.agentID, character });
     } catch (e) {
       elizaLogger.error(`Error processing create character: ${e}`);
       res.status(400).json({
