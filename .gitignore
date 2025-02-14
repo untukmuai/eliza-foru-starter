@@ -7,3 +7,5 @@ dist/
 
 db.sqlite
 .idea
+src/.DS_Store
+.DS_Store

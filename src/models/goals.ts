@@ -1,13 +1,15 @@
 import { Model, DataTypes, Sequelize } from "sequelize";
 
 export default function (sequelize: Sequelize) {
-  class Accounts extends Model {
+  class Goals extends Model {
     public id!: string; // UUID
-    public username!: string;
-    public email!: string;
-    public profile!: object; // JSONB
+    public userId!: string;
+    public name!: string;
+    public status!: string;
+    public description!: string;
+    public roomId!: string;
+    public objectives!: object; // JSONB
     public createdAt!: Date;
-    public updatedAt!: Date;
 
     // Define associations if needed
     static associate(models: any) {
@@ -15,7 +17,7 @@ export default function (sequelize: Sequelize) {
     }
   }
 
-  Accounts.init(
+  Goals.init(
     {
       id: {
         type: DataTypes.UUID,
@@ -23,20 +25,32 @@ export default function (sequelize: Sequelize) {
         primaryKey: true,
         allowNull: false,
       },
-      username: {
+      userId: {
         type: DataTypes.STRING(255),
         allowNull: false,
-        unique: true,
+        unique: false,
       },
-      email: {
+      name: {
         type: DataTypes.STRING(255),
         allowNull: false,
-        unique: true,
-        validate: {
-          isEmail: true,
-        },
+        unique: false,
       },
-      profile: {
+      status: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        unique: false,
+      },
+      description: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        unique: false,
+      },
+      roomId: {
+        type: DataTypes.STRING(255),
+        allowNull: false,
+        unique: false,
+      },
+      objectives: {
         type: DataTypes.JSONB,
         allowNull: true,
       },
@@ -45,19 +59,14 @@ export default function (sequelize: Sequelize) {
         allowNull: false,
         defaultValue: DataTypes.NOW,
       },
-      updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW,
-      },
     },
     {
       sequelize,
-      modelName: "Accounts",
-      tableName: "accounts", // Ensure this matches your database table
+      modelName: "Goals",
+      tableName: "goals", // Ensure this matches your database table
       timestamps: true, // Enable timestamps if needed
     }
   );
 
-  return Accounts;
+  return Goals;
 }
