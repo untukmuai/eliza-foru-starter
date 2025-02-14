@@ -39,7 +39,7 @@ export function createApiRoutes(agents, directClient, messageHandlerTemplate) {
     // Determine __dirname in ES modules
     const __dirname = path.dirname(new URL(import.meta.url).pathname);
     const swaggerDocument = JSON.parse(
-      fs.readFileSync(path.join(__dirname, "./swagger_output.json"), "utf8")
+      fs.readFileSync(path.join(__dirname, "../data/swagger_output.json"), "utf8")
     );
     router.use(
       "/api-docs",

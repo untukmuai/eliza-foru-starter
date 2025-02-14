@@ -3,6 +3,7 @@ import { elizaLogger, validateCharacterConfig } from "@elizaos/core";
 import db from "../../models/index.js";
 import { stringToUuid } from "@elizaos/core";
 import { GoalType } from "../../database/enum-database.js";
+import { goalsToElizaGoals, personalityToCharacter } from "../../services/openAiService.js";
 
 const router = express.Router();
 
@@ -76,13 +77,20 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
     }
   });
 
+
   // POST /agents-create — create a new agent
   router.post("/agents-create", async (req, res) => {
-    const character = req.body;
     try {
+      const { goals, ...unprocessedCharacter } = req.body;
+
+      const [character, elizaGoals] = await Promise.all([
+        personalityToCharacter(unprocessedCharacter),
+        goalsToElizaGoals(goals)
+      ]);
+      
       const characterConfig = await db.CharacterConfig.findOne({
-        where: { name: character.name },
-      });
+        where: { name: character.name},
+      })
       if (characterConfig) {
         throw new Error(
           `CharacterConfig with name '${character.name}' already exists.`
@@ -93,14 +101,18 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
         name: character.name,
         character,
       });
-      // TODO: Create AgentConfig records for secondary goals from LLM
-      // await db.AgentConfig.create({
-      //   agent_id: character.id,
-      //   config_key: GoalType.SECONDARY,
-      //   config_value: [
 
-      //   ],
-      // });
+      const agentResult = await directClient.startAgent(character);
+      elizaLogger.log(`${character.name} started`);
+
+      await db.AgentConfig.create({
+        agent_id: agentResult.agentId,
+        config_key: GoalType.SECONDARY,
+        config_value: elizaGoals,
+      });
+
+      elizaLogger.log(`${character.name} secondary goals inserted`);
+      res.status(201).json({ id: agentResult.agentID, character });
     } catch (e) {
       elizaLogger.error(`Error processing create character: ${e}`);
       res.status(400).json({
@@ -109,9 +121,6 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       });
       return;
     }
-    const agentResult = await directClient.startAgent(character);
-    elizaLogger.log(`${character.name} started`);
-    res.status(201).json({ id: agentResult.agentId, character });
   });
 
   // GET /agents/:agentId/:roomId/memories — retrieve agent memories
