@@ -1,49 +1,38 @@
-# Use a specific Node.js version for better reproducibility
-FROM node:23.8.0-slim AS builder
+# Use the Node.js Alpine base image for the build stage
+FROM node:23.8.0-alpine AS builder
 
-# Install pnpm globally and install necessary build tools
-RUN npm install -g pnpm@10.4.0 && \
-    apt-get update && \
-    apt-get install -y git python3 make g++ && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Set Python 3 as the default python
-RUN ln -s /usr/bin/python3 /usr/bin/python
+# Install build dependencies
+RUN apk add --no-cache \
+    git \
+    python3 \
+    make \
+    g++ \
+    && npm install -g pnpm@10.4.0
 
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and other configuration files
-COPY package.json ./
-COPY pnpm-lock.yaml ./
-COPY tsconfig.json ./
+# Copy package.json and pnpm-lock.yaml
+COPY package.json pnpm-lock.yaml tsconfig.json ./
 
 # Copy the rest of the application code
 COPY ./src ./src
 
-# Install dependencies and build the project
+# Install dependencies
 RUN pnpm install --frozen-lockfile
-RUN pnpm build 
 
-# Create dist directory and set permissions
-RUN mkdir -p /app/dist && \
-    chown -R node:node /app && \
-    chmod -R 755 /app
-
-# Switch to node user
-USER node
+# Build the application
+RUN pnpm build
 
 # Create a new stage for the final image
-FROM node:23.8.0-slim
+FROM node:23.8.0-alpine
 
 # Install runtime dependencies if needed
-RUN npm install -g pnpm@10.4.0
-RUN apt-get update && \
-    apt-get install -y git python3 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+    git \
+    python3
 
+# Set the working directory
 WORKDIR /app
 
 # Copy built artifacts and production dependencies from the builder stage
@@ -54,6 +43,8 @@ COPY --from=builder /app/dist /app/dist
 COPY --from=builder /app/tsconfig.json /app/
 COPY --from=builder /app/pnpm-lock.yaml /app/
 
+# Expose the application port
 EXPOSE 3000
+
 # Set the command to run the application
 CMD ["pnpm", "start", "--non-interactive"]
