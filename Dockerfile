@@ -2,7 +2,13 @@
 FROM node:23.8.0-slim AS builder
 
 # Install pnpm globally and install necessary build tools
-RUN npm install -g pnpm@9.15.1
+RUN npm install -g pnpm@10.4.0 && \
+    apt-get install -y git python3 make g++ && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set Python 3 as the default python
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 # Set the working directory
 WORKDIR /app
@@ -31,7 +37,10 @@ USER node
 FROM node:23.8.0-slim
 
 # Install runtime dependencies if needed
-RUN npm install -g pnpm@9.15.1
+RUN npm install -g pnpm@10.4.0
+RUN apt-get install -y git python3 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
