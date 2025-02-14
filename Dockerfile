@@ -30,7 +30,8 @@ FROM node:23.8.0-alpine
 # Install runtime dependencies if needed
 RUN apk add --no-cache \
     git \
-    python3
+    python3 \
+    && npm install -g pnpm@10.4.0
 
 # Set the working directory
 WORKDIR /app
