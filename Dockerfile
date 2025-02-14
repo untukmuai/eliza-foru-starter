@@ -3,6 +3,7 @@ FROM node:23.8.0-slim AS builder
 
 # Install pnpm globally and install necessary build tools
 RUN npm install -g pnpm@10.4.0 && \
+    apt-get update && \
     apt-get install -y git python3 make g++ && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -38,7 +39,8 @@ FROM node:23.8.0-slim
 
 # Install runtime dependencies if needed
 RUN npm install -g pnpm@10.4.0
-RUN apt-get install -y git python3 && \
+RUN apt-get update && \
+    apt-get install -y git python3 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
