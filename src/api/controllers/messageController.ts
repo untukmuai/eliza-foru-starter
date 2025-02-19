@@ -142,7 +142,7 @@ const messageRoutes = (
     if (text==="") {
       const response = {
         user: runtime.character.name,
-        text: await greetings(character),
+        text: await greetings(runtime.character),
         action: 'NONE'
       }
       res.json([response]);
