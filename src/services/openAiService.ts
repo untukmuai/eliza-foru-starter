@@ -91,8 +91,10 @@ export async function greetings(character) {
           given these data:
           
           Your Name: ${character.name}
+
+          User Name: ${username}
           
-          Generate greetings message that usually appear in the first chat, dont forget to introduce your name.
+          Generate greetings message that usually appear in the first chat, dont forget to introduce your name. Mention the user's name also.
           `,
       },
     ],
