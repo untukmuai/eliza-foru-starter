@@ -20,6 +20,8 @@ import {
   convertGoalsListToString,
   formatPrimaryGoal,
 } from "../../services/goalManagementServices.ts";
+import { greetings } from "../../services/openAiService.js";
+import { character } from "../../character.ts";
 
 // Configure multer storage for file uploads
 const storage = multer.diskStorage({
@@ -136,6 +138,17 @@ const messageRoutes = (
     const secondaryGoals: string = convertGoalsListToString(secondaryGoalList);
 
     const text = req.body.text;
+    
+    if (text==="") {
+      const response = {
+        user: runtime.character.name,
+        text: await greetings(runtime.character, req.body.userName),
+        action: 'NONE'
+      }
+      res.json([response]);
+      return
+    }
+
     const messageId = stringToUuid2(Date.now().toString());
     const attachments = [];
     if (req.file) {

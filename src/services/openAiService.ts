@@ -76,3 +76,30 @@ export async function personalityToCharacter(theContent) {
   const finalResult = { ...mainResult, ...additional };
   return finalResult;
 }
+
+export async function greetings(character, username) {
+  const chatCompletion = await client.chat.completions.create({
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are an greetings agent that return ONLY greetings string based on the data provided",
+      },
+      {
+        role: "user",
+        content: `
+          given these data:
+          
+          Your Name: ${character.name}
+
+          User Name: ${username}
+          
+          Generate greetings message that usually appear in the first chat, dont forget to introduce your name. Mention the user's name also.
+          `,
+      },
+    ],
+    model: "gpt-4o-mini",
+  });
+  const responseText = chatCompletion.choices[0].message.content;
+  return responseText;
+}
