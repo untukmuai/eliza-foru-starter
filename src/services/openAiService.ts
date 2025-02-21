@@ -77,7 +77,7 @@ export async function personalityToCharacter(theContent) {
   return finalResult;
 }
 
-export async function greetings(character) {
+export async function greetings(character, username) {
   const chatCompletion = await client.chat.completions.create({
     messages: [
       {
