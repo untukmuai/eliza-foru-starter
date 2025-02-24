@@ -7,8 +7,8 @@ import {
 export const character: Character = {
   name: "masteruwu",
   clients: [
-    Clients.DIRECT, 
-    // Clients.TWITTER
+    Clients.DIRECT,
+    Clients.TWITTER
   ],
   modelProvider: ModelProviderName.OPENAI,
   settings: {
@@ -26,10 +26,10 @@ export const character: Character = {
       POST_INTERVAL_MAX: "180",
       ENABLE_ACTION_PROCESSING: "true",
       ACTION_INTERVAL: "5",
-      POST_IMMEDIATELY: "false",
+      POST_IMMEDIATELY: "true",
       TWITTER_SPACES_ENABLE: "false",
       MAX_ACTIONS_PROCESSING: "1",
-      ACTION_TIMELINE_TYPE: "latest",
+      ACTION_TIMELINE_TYPE: "foryou",
     },
     modelConfig: {
       temperature: 0.2,
