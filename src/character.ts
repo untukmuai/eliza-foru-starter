@@ -6,13 +6,30 @@ import {
 
 export const character: Character = {
   name: "masteruwu",
-  clients: [Clients.DIRECT],
+  clients: [
+    Clients.DIRECT, 
+    // Clients.TWITTER
+  ],
   modelProvider: ModelProviderName.OPENAI,
   settings: {
     secrets: {
-      TWITTER_USERNAME: "",
-      TWITTER_PASSWORD: "",
-      TWITTER_EMAIL: "",
+      TWITTER_DRY_RUN: "true",
+      TWITTER_USERNAME: "baltazard_eth",
+      TWITTER_PASSWORD: "K1ngKaz3123!",
+      TWITTER_EMAIL: "ahmad.aryanto0@hotmail.com",
+      MAX_TWEET_LENGTH: "280",
+      TWITTER_SEARCH_ENABLE: "true",
+      TWITTER_RETRY_LIMIT: "5",
+      TWITTER_POLL_INTERVAL: "120",
+      TWITTER_TARGET_USERS: "usman_polos",
+      POST_INTERVAL_MIN: "90",
+      POST_INTERVAL_MAX: "180",
+      ENABLE_ACTION_PROCESSING: "true",
+      ACTION_INTERVAL: "5",
+      POST_IMMEDIATELY: "false",
+      TWITTER_SPACES_ENABLE: "false",
+      MAX_ACTIONS_PROCESSING: "1",
+      ACTION_TIMELINE_TYPE: "latest",
     },
     modelConfig: {
       temperature: 0.2,
