@@ -13,7 +13,7 @@ export const character: Character = {
   modelProvider: ModelProviderName.OPENAI,
   settings: {
     secrets: {
-      TWITTER_DRY_RUN: "true",
+      TWITTER_DRY_RUN: "false",
       TWITTER_USERNAME: "baltazard_eth",
       TWITTER_PASSWORD: "K1ngKaz3123!",
       TWITTER_EMAIL: "ahmad.aryanto0@hotmail.com",
