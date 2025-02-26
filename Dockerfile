@@ -4,14 +4,14 @@ FROM node:23.8.0-slim
 
 COPY ./ssh-repo-key /root/.ssh/id_rsa
 RUN chmod 600 /root/.ssh/id_rsa
+RUN apt-get update && \
+    apt-get install -y git python3 make g++ ssh-keyscan && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 # Install pnpm globally and install necessary build tools
-RUN npm install -g pnpm@10.4.0 && \
-    apt-get update && \
-    apt-get install -y git python3 make g++ && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN npm install -g pnpm@10.4.0
 
 # Set Python 3 as the default python
 RUN ln -s /usr/bin/python3 /usr/bin/python
