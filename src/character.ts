@@ -6,10 +6,7 @@ import {
 
 export const character: Character = {
   name: "masteruwu",
-  clients: [
-    Clients.DIRECT,
-    Clients.TWITTER
-  ],
+  clients: [Clients.DIRECT, Clients.TWITTER],
   modelProvider: ModelProviderName.OPENAI,
   settings: {
     secrets: {
@@ -30,6 +27,7 @@ export const character: Character = {
       TWITTER_SPACES_ENABLE: "false",
       MAX_ACTIONS_PROCESSING: "1",
       ACTION_TIMELINE_TYPE: "foryou",
+      TWITTER_SOCKS_PROXY: "socks5://rduuoqxa-id-30:87njuuziu5v6@p.webshare.io:80",
     },
     modelConfig: {
       temperature: 0.2,
