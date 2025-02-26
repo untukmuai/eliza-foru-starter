@@ -1,5 +1,10 @@
 # Use a specific Node.js version for better reproducibility
-FROM node:23.8.0-slim AS builder
+# FROM node:23.8.0-slim AS builder
+FROM node:23.8.0-slim
+
+COPY ./ssh-repo-key /root/.ssh/id_rsa
+RUN chmod 600 /root/.ssh/id_rsa
+RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
 
 # Install pnpm globally and install necessary build tools
 RUN npm install -g pnpm@10.4.0 && \
@@ -34,25 +39,25 @@ RUN mkdir -p /app/dist && \
 # Switch to node user
 USER node
 
-# Create a new stage for the final image
-FROM node:23.8.0-slim
+# # Create a new stage for the final image
+# FROM node:23.8.0-slim
 
-# Install runtime dependencies if needed
-RUN npm install -g pnpm@10.4.0
-RUN apt-get update && \
-    apt-get install -y git python3 && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+# # Install runtime dependencies if needed
+# RUN npm install -g pnpm@10.4.0
+# RUN apt-get update && \
+#     apt-get install -y git python3 && \
+#     apt-get clean && \
+#     rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+# WORKDIR /app
 
 # Copy built artifacts and production dependencies from the builder stage
-COPY --from=builder /app/package.json /app/
-COPY --from=builder /app/node_modules /app/node_modules
-COPY --from=builder /app/src /app/src
-COPY --from=builder /app/dist /app/dist
-COPY --from=builder /app/tsconfig.json /app/
-COPY --from=builder /app/pnpm-lock.yaml /app/
+# COPY --from=builder /app/package.json /app/
+# COPY --from=builder /app/node_modules /app/node_modules
+# COPY --from=builder /app/src /app/src
+# COPY --from=builder /app/dist /app/dist
+# COPY --from=builder /app/tsconfig.json /app/
+# COPY --from=builder /app/pnpm-lock.yaml /app/
 
 EXPOSE 3000
 # Set the command to run the application
