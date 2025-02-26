@@ -18,7 +18,7 @@ export const character: Character = {
       TWITTER_SEARCH_ENABLE: "true",
       TWITTER_RETRY_LIMIT: "5",
       TWITTER_POLL_INTERVAL: "120",
-      TWITTER_TARGET_USERS: "usman_polos",
+      TWITTER_TARGET_USERS: "4UAICrypto,pangxuekai",
       POST_INTERVAL_MIN: "90",
       POST_INTERVAL_MAX: "180",
       ENABLE_ACTION_PROCESSING: "true",
@@ -27,7 +27,8 @@ export const character: Character = {
       TWITTER_SPACES_ENABLE: "false",
       MAX_ACTIONS_PROCESSING: "1",
       ACTION_TIMELINE_TYPE: "foryou",
-      TWITTER_SOCKS_PROXY: "socks5://rduuoqxa-id-30:87njuuziu5v6@p.webshare.io:80",
+      TWITTER_SOCKS_PROXY:
+        "socks5://rduuoqxa-id-30:87njuuziu5v6@p.webshare.io:80",
     },
     modelConfig: {
       temperature: 0.2,
