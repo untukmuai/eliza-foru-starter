@@ -1,6 +1,5 @@
 # Use a specific Node.js version for better reproducibility
-# FROM node:23.8.0-slim AS builder
-FROM node:23.8.0-slim
+FROM node:23.8.0-slim AS builder
 
 COPY ./ssh-repo-key /root/.ssh/id_rsa
 RUN chmod 600 /root/.ssh/id_rsa
