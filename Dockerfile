@@ -5,7 +5,7 @@ FROM node:23.8.0-slim
 COPY ./ssh-repo-key /root/.ssh/id_rsa
 RUN chmod 600 /root/.ssh/id_rsa
 RUN apt-get update && \
-    apt-get install -y git python3 make g++ ssh-keyscan && \
+    apt-get install -y git python3 make g++ openssh-client && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 RUN ssh-keyscan github.com >> /root/.ssh/known_hosts
