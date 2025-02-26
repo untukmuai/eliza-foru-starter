@@ -32,9 +32,10 @@ RUN pnpm install --frozen-lockfile
 RUN pnpm build 
 
 # Create dist directory and set permissions
-RUN mkdir -p /app/dist && \
-    chown -R node:node /app && \
-    chmod -R 755 /app
+# RUN mkdir -p /app/dist && \
+#     chown -R node:node /app && \
+#     chmod -R 755 /app
+RUN chown -R node:node /app
 
 # Switch to node user
 USER node
