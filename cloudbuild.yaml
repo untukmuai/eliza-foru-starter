@@ -46,6 +46,3 @@ tags:
   - gcp-cloud-build-deploy-cloud-run
   - gcp-cloud-build-deploy-cloud-run-managed
   - agent-core-dev
-caches:
-  - path: '/app/node_modules'
-  
