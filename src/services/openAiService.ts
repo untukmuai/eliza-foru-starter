@@ -68,9 +68,16 @@ export async function personalityToCharacter(theContent) {
   });
   const responseText = chatCompletion.choices[0].message.content;
   const mainResult = JSON.parse(responseText);
+
+  let modelProvider;
+  if (theContent.model_choice.startsWith("gpt")) {
+    modelProvider = "openai";
+  } else if (theContent.model_choice==="gemini") {
+    modelProvider = "google";
+  }
   const additional = {
     clients: ["direct"],
-    modelProvider: "openai",
+    modelProvider: modelProvider,
     plugins: [],
   };
   const finalResult = { ...mainResult, ...additional };

@@ -204,6 +204,10 @@
                   "goals": {
                     "type": "string",
                     "example": "5-10 goals e.g. 1. Expand HYROX Athlete Community Engagement \n - Target: 10% increase in interactions per month \n - Priority: High \n 2. Grow Social Media & Content Reach \n - Target: +5,000 new followers in 3 months \n - Priority: High"
+                  },
+                  "model_choice": {
+                    "type": "string",
+                    "example": "gemini"
                   }
                 },
                 "required": [
@@ -213,7 +217,8 @@
                   "tone_voice",
                   "community_name",
                   "community_description",
-                  "goals"
+                  "goals",
+                  "model_choice"
                 ]
               }
             }
