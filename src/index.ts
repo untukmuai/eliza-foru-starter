@@ -1,6 +1,7 @@
 
 import {
   AgentRuntime,
+  Clients,
   elizaLogger,
   getEnvVariable,
   ModelProviderName,
@@ -123,13 +124,26 @@ const startAgents = async () => {
   const directApi = new DirectApi();
   let serverPort = parseInt(settings.SERVER_PORT || "3000");
 
-  let characters = [character];
+  let characters = [];
 
+  if (getEnvVariable("LOAD_CHARACTER_INTERNAL", "false") === "true") {
+    console.log("loading preload characters");
+    if (getEnvVariable("DISABLE_ALL_CLIENTS_INTERACTION", "false") === "true") {
+      console.log("Disabling all clients interaction");
+      character.clients = [Clients.DIRECT]; 
+    }
+    characters.push(character);
+  }
   if (getEnvVariable("LOAD_CHARACTER_FROM_DB", "false") === "true") {
     console.log("loading characters from db");
     characters.push(...(await loadCharactersFromDB()));
   } 
 
+  if (getEnvVariable("LOAD_CHARACTER_FROM_DB", "false") === "false" && getEnvVariable("LOAD_CHARACTER_INTERNAL", "false") === "false") {
+    console.log("No characters loaded");
+    throw new Error("No characters loaded");
+  }
+  
   console.log("characters", characters);
   try {
     const startPromises = characters.map((character) => {
@@ -143,6 +157,11 @@ const startAgents = async () => {
         },
         embeddingModel: "all-MiniLM-L6-v2",
       };
+
+      if (getEnvVariable("DISABLE_ALL_CLIENTS_INTERACTION", "false") === "true") {
+        console.log("Disabling all clients interaction");
+        character.clients = [Clients.DIRECT];
+      }
       return startAgent(character, directApi as DirectApi);
     });
     await Promise.all(startPromises);

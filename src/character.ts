@@ -6,9 +6,13 @@ import {
 
 export const character: Character = {
   name: "masteruwu",
-  clients: [Clients.DIRECT, Clients.TWITTER],
+  clients: [
+    Clients.DIRECT, 
+    Clients.TWITTER
+  ],
   modelProvider: ModelProviderName.OPENAI,
   settings: {
+    model: "large",
     secrets: {
       TWITTER_DRY_RUN: "false",
       TWITTER_USERNAME: "baltazard_eth",
