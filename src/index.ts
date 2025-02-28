@@ -129,9 +129,10 @@ const startAgents = async () => {
     console.log("loading characters from db");
     characters.push(...(await loadCharactersFromDB()));
   } 
+
   console.log("characters", characters);
   try {
-    for (const character of characters) {
+    const startPromises = characters.map((character) => {
       character.modelProvider ??= ModelProviderName.OPENAI;
       character.settings ??= {
         modelConfig: {
@@ -142,10 +143,11 @@ const startAgents = async () => {
         },
         embeddingModel: "all-MiniLM-L6-v2",
       };
-      await startAgent(character, directApi as DirectApi);
-    }
+      return startAgent(character, directApi as DirectApi);
+    });
+    await Promise.all(startPromises);
   } catch (error) {
-    elizaLogger.error("Error starting agents:", error);
+    elizaLogger.error("Error starting agents concurrently:", error);
   }
 
   while (!(await checkPortAvailable(serverPort))) {
