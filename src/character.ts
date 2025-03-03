@@ -6,18 +6,17 @@ import {
 
 export const character: Character = {
   name: "masteruwu",
-  clients: [
-    Clients.DIRECT, 
-    Clients.TWITTER
-  ],
+  clients: [Clients.DIRECT, Clients.TWITTER],
   modelProvider: ModelProviderName.OPENAI,
   settings: {
     model: "large",
     secrets: {
       TWITTER_DRY_RUN: "false",
       TWITTER_USERNAME: "baltazard_eth",
-      TWITTER_PASSWORD: "K1ngKaz3123!",
-      TWITTER_EMAIL: "ahmad.aryanto0@hotmail.com",
+      TWITTER_COOKIES_AUTH_TOKEN: "13d41ad46b7b2029282f486cd406dc299d44f195",
+      TWITTER_COOKIES_CT0:
+        "f929a232df53fe6b9ce1b7aeca27116272649e73c56756e074c2acd4f3489321713127b79e881ea6cc52bffae626eae6ebd0d1976c495deaf887f7827c51730c3cb40533e2bcc29e9ea26798c1975567",
+      TWITTER_COOKIES_GUEST_ID: "v1%3A174056061638465713",
       MAX_TWEET_LENGTH: "280",
       TWITTER_SEARCH_ENABLE: "true",
       TWITTER_RETRY_LIMIT: "5",

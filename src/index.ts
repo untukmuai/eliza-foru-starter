@@ -82,6 +82,9 @@ async function startAgent(character: Character, directApi: DirectApi) {
     const runtime = createAgent(character, db, cache, token);
 
     await runtime.initialize();
+    if (runtime.databaseAdapter.db === undefined) {
+      runtime.databaseAdapter.db = db;
+    }
 
     runtime.clients = await initializeClients(character, runtime);
 
