@@ -18,7 +18,7 @@
     "@elizaos/client-auto": "0.1.9",
     "@elizaos/client-discord": "0.1.9",
     "@elizaos/client-telegram": "0.1.9",
-    "foru-client-twitter": "git+ssh://git@github.com:untukmuai/foru-client-twitter.git",
+    "foru-client-twitter": "git+ssh://git@github.com:untukmuai/foru-client-twitter.git#74d9eaa548fe49787121246560abdfb636bb255a",
     "@elizaos/core": "0.1.9",
     "@elizaos/plugin-bootstrap": "0.1.9",
     "@elizaos/plugin-image-generation": "0.1.9",
