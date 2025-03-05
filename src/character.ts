@@ -15,9 +15,6 @@ export const character: Character = {
     model: "large",
     secrets: {
       TWITTER_DRY_RUN: "false",
-      TWITTER_USERNAME: "baltazard_eth",
-      TWITTER_PASSWORD: "K1ngKaz3123!",
-      TWITTER_EMAIL: "ahmad.aryanto0@hotmail.com",
       MAX_TWEET_LENGTH: "280",
       TWITTER_SEARCH_ENABLE: "true",
       TWITTER_RETRY_LIMIT: "5",
@@ -31,8 +28,6 @@ export const character: Character = {
       TWITTER_SPACES_ENABLE: "false",
       MAX_ACTIONS_PROCESSING: "1",
       ACTION_TIMELINE_TYPE: "foryou",
-      TWITTER_SOCKS_PROXY:
-        "socks5://rduuoqxa-id-30:87njuuziu5v6@p.webshare.io:80",
     },
     modelConfig: {
       temperature: 0.2,

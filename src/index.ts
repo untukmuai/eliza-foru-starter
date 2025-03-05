@@ -135,6 +135,12 @@ const startAgents = async () => {
       console.log("Disabling all clients interaction");
       character.clients = [Clients.DIRECT]; 
     }
+
+    character.settings.secrets.TWITTER_USERNAME = getEnvVariable("BUILDIN_TWITTER_USERNAME", "");
+    character.settings.secrets.TWITTER_COOKIES_AUTH_TOKEN = getEnvVariable("BUILDIN_TWITTER_COOKIES_AUTH_TOKEN", "");
+    character.settings.secrets.TWITTER_COOKIES_CT0 = getEnvVariable("BUILDIN_TWITTER_COOKIES_CT0","");
+    character.settings.secrets.TWITTER_COOKIES_GUEST_ID = getEnvVariable("BUILDIN_TWITTER_COOKIES_GUEST_ID","");
+    character.settings.secrets.TWITTER_SOCKS_PROXY = getEnvVariable("BUILDIN_TWITTER_SOCKS_PROXY","");
     characters.push(character);
   }
   if (getEnvVariable("LOAD_CHARACTER_FROM_DB", "false") === "true") {
