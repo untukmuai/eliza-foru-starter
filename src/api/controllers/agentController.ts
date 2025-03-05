@@ -4,11 +4,11 @@ import db from "../../models/index.js";
 import { stringToUuid } from "@elizaos/core";
 import { GoalType } from "../../database/enum-database.js";
 import { goalsToElizaGoals, personalityToCharacter } from "../../services/openAiService.js";
+import { TwitterCheckOnly } from "foru-client-twitter";
 
 const router = express.Router();
 
 const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
-
   // GET /agents — list all agents
   router.get("/agents", (req, res) => {
     const agentsList = Array.from(agents.values()).map((agent) => ({
@@ -77,7 +77,6 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
     }
   });
 
-
   // POST /agents-create — create a new agent
   router.post("/agents-create", async (req, res) => {
     try {
@@ -85,12 +84,12 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
 
       const [character, elizaGoals] = await Promise.all([
         personalityToCharacter(unprocessedCharacter),
-        goalsToElizaGoals(goals)
+        goalsToElizaGoals(goals),
       ]);
-      
+
       const characterConfig = await db.CharacterConfig.findOne({
-        where: { name: character.name},
-      })
+        where: { name: character.name },
+      });
       if (characterConfig) {
         throw new Error(
           `CharacterConfig with name '${character.name}' already exists.`
@@ -120,6 +119,30 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
         message: e.message,
       });
       return;
+    }
+  });
+
+  // POST /agents/:agentId/twitter/check-cookies — check Twitter cookies valid or not
+  router.post("/agents/:agentId/twitter/check-cookies", async (req, res) => {
+    const agentId = req.params.agentId;
+    const runtime = agents.get(agentId);
+    if (!runtime) {
+      res.status(404).send("Agent not found");
+      return;
+    }
+    const { auth_token, ct0, guest_id } = req.body;
+    try {
+      const resultLogin = await TwitterCheckOnly.checkCookies(
+        runtime,
+        auth_token,
+        ct0,
+        guest_id
+      );
+      elizaLogger.info("Twitter login result: ", resultLogin);
+      res.json({ resultLogin });
+    } catch (error) {
+      elizaLogger.error("Error checking cookies:", error);
+      res.status(500).json({ error: "Failed to check cookies" });
     }
   });
 
