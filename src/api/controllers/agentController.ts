@@ -42,8 +42,14 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
         return;
       }
 
-      console.log("inisiagent");
-      console.log(agent);
+      const proxified = await db.AgentProxy.findOne({
+        where: { agentId: agentId },
+      });
+
+      if (proxified) {
+        throw new Error("Proxy has been registered for this agent");
+      }
+
       const character = JSON.parse(JSON.stringify(agent.character));
       delete character.id;
 
