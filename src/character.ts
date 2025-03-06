@@ -10,7 +10,7 @@ export const character: Character = {
     Clients.DIRECT, 
     Clients.TWITTER
   ],
-  modelProvider: ModelProviderName.OPENAI,
+  modelProvider: ModelProviderName.DEEPSEEK,
   settings: {
     model: "large",
     secrets: {
