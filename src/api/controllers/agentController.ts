@@ -33,6 +33,78 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
     });
   });
 
+  router.post("/agents/:agentId/twitter/cookies", async (req, res) => {
+    try {
+      const agentId = req.params.agentId;
+      let agent = agents.get(agentId);
+      if (!agent) {
+        res.status(404).json({ error: "Agent not found" });
+        return;
+      }
+
+      console.log("inisiagent");
+      console.log(agent);
+      const character = JSON.parse(JSON.stringify(agent.character));
+      delete character.id;
+
+      character.settings.secrets = {
+        ...character.settings.secrets,
+        ...req.body.cookies
+      };
+
+      const agentProxy = await db.AgentProxy.findOne({
+        where: { agentId: null },
+        attributes: ["id", "host", "port", "username", "password"],
+        raw: true
+      });
+
+      // character.settings.secrets.TWITTER_SOCKS_PROXY = "socks5://rduuoqxa-id-31:87njuuziu5v6@p.webshare.io:80"
+      character.settings.secrets.TWITTER_SOCKS_PROXY = `socks5://${agentProxy.username}:${agentProxy.password}@${agentProxy.host}:${agentProxy.port}`;
+
+      // if (!character.clients.includes("twitter")) {
+      //   character.clients.push("twitter");
+      // }
+
+      const characterConfig = await db.CharacterConfig.findOne({
+        where: { name: character.name },
+      });
+
+      if (!characterConfig) {
+        throw new Error(
+          `CharacterConfig with name "${character.name}" not found.`
+        );
+      }
+
+      await db.CharacterConfig.update(
+        { character, updatedAt: new Date() },
+        { where: { name: character.name } }
+      );
+
+      await db.AgentProxy.update(
+        { agentId: agentId, updatedAt: new Date() },
+        { where: { id: agentProxy.id } }
+      );
+
+      if (agent) {
+        agent.stop();
+        directClient.unregisterAgent(agent);
+      }
+      // (Assuming startAgent returns a promise for a new agent)
+      agent = await directClient.startAgent(character);
+      elizaLogger.log(`${character.name} started`);
+
+      res.json({ id: character.id, status: "OK", character });
+    } catch (e) {
+      elizaLogger.error(`Error processing cookies update: ${e}`);
+      res.status(400).json({
+        id: req.params.agentId,
+        success: false,
+        message: e.message,
+        character: null 
+      });
+    };
+  });
+
   // POST /agents/:agentId/set — update an agent’s character config
   router.post("/agents/:agentId/set", async (req, res) => {
     const agentId = req.params.agentId;
