@@ -38,8 +38,7 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       const agentId = req.params.agentId;
       let agent = agents.get(agentId);
       if (!agent) {
-        res.status(404).json({ error: "Agent not found" });
-        return;
+        throw new Error("Agent not found");
       }
 
       const proxified = await db.AgentProxy.findOne({
