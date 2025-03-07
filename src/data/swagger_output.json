@@ -144,6 +144,49 @@
         }
       }
     },
+    "/agents/{agentId}/twitter/cookies": {
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "agentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cookies": {
+                    "type": "object",
+                    "properties": {
+                      "TWITTER_USERNAME": { "type": "string", "example": "alvinracht" },
+                      "TWITTER_COOKIES_CT0": { "type": "string", "example": "84ea358a7f631ae70f4..." },
+                      "TWITTER_COOKIES_GUEST_ID": { "type": "string", "example": "v1%3A173310690857128229" },
+                      "TWITTER_COOKIES_AUTH_TOKEN": { "type": "string", "example": "d55bcdf2bc890c90f3..." }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/agents-create": {
       "post": {
         "summary": "Generate a character profile from personality data",
