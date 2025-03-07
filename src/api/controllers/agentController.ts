@@ -5,6 +5,7 @@ import { stringToUuid } from "@elizaos/core";
 import { GoalType } from "../../database/enum-database.js";
 import { goalsToElizaGoals, personalityToCharacter } from "../../services/openAiService.js";
 import { TwitterCheckOnly } from "foru-client-twitter";
+import { AppError } from "../../utils/errors.js";
 
 const router = express.Router();
 
@@ -38,15 +39,32 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       const agentId = req.params.agentId;
       let agent = agents.get(agentId);
       if (!agent) {
-        throw new Error("Agent not found");
+        throw new AppError("Agent not found", 404);
       }
 
-      const proxified = await db.AgentProxy.findOne({
-        where: { agentId: agentId },
-      });
+      const { 
+        TWITTER_COOKIES_CT0: ct0, 
+        TWITTER_COOKIES_GUEST_ID: guest_id, 
+        TWITTER_COOKIES_AUTH_TOKEN: auth_token 
+      } = req.body.cookies;
 
-      if (proxified) {
-        throw new Error("Proxy has been registered for this agent");
+      agent.character.settings.secrets = {
+        ...agent.character.settings.secrets,
+        ...req.body.cookies
+      };
+      
+      try {
+        agent.character.settings.secrets.TWITTER_SOCKS_PROXY = "socks5://rduuoqxa-id-2300:87njuuziu5v6@p.webshare.io:80"
+        const resultLogin = await TwitterCheckOnly.checkCookies(
+          agent,
+          auth_token,
+          ct0,
+          guest_id
+        );
+        elizaLogger.info("Twitter login result: ", resultLogin);
+      } catch (e) {
+        elizaLogger.error("Error checking cookies:", e);
+        throw new AppError(`INVALID_COOKIES`, 200);
       }
 
       const character = JSON.parse(JSON.stringify(agent.character));
@@ -57,11 +75,18 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
         ...req.body.cookies
       };
 
-      const agentProxy = await db.AgentProxy.findOne({
-        where: { agentId: null },
+      let agentProxy = await db.AgentProxy.findOne({
+        where: { agentId: agentId },
         attributes: ["id", "host", "port", "username", "password"],
         raw: true
       });
+      if (!agentProxy) {
+        agentProxy = await db.AgentProxy.findOne({
+          where: { agentId: null },
+          attributes: ["id", "host", "port", "username", "password"],
+          raw: true
+        });
+      }
 
       // character.settings.secrets.TWITTER_SOCKS_PROXY = "socks5://rduuoqxa-id-31:87njuuziu5v6@p.webshare.io:80"
       character.settings.secrets.TWITTER_SOCKS_PROXY = `socks5://${agentProxy.username}:${agentProxy.password}@${agentProxy.host}:${agentProxy.port}`;
@@ -75,8 +100,8 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       });
 
       if (!characterConfig) {
-        throw new Error(
-          `CharacterConfig with name "${character.name}" not found.`
+        throw new AppError(
+          `CharacterConfig with name "${character.name}" not found.`, 400
         );
       }
 
@@ -98,10 +123,10 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       agent = await directClient.startAgent(character);
       elizaLogger.log(`${character.name} started`);
 
-      res.json({ id: character.id, status: "OK", character });
+      res.json({ id: character.id, success: true, character });
     } catch (e) {
       elizaLogger.error(`Error processing cookies update: ${e}`);
-      res.status(400).json({
+      res.status(e.code || 500).json({
         id: req.params.agentId,
         success: false,
         message: e.message,
