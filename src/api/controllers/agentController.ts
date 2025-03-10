@@ -53,17 +53,17 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
         ...req.body.cookies
       };
       
-      try {
-        agent.character.settings.secrets.TWITTER_SOCKS_PROXY = "socks5://rduuoqxa-id-2300:87njuuziu5v6@p.webshare.io:80"
-        const resultLogin = await TwitterCheckOnly.checkCookies(
-          agent,
-          auth_token,
-          ct0,
-          guest_id
-        );
-        elizaLogger.info("Twitter login result: ", resultLogin);
-      } catch (e) {
-        elizaLogger.error("Error checking cookies:", e);
+      agent.character.settings.secrets.TWITTER_SOCKS_PROXY = "socks5://rduuoqxa-id-2300:87njuuziu5v6@p.webshare.io:80"
+      const resultLogin = await TwitterCheckOnly.checkCookies(
+        agent,
+        auth_token,
+        ct0,
+        guest_id
+      );
+      elizaLogger.info("Twitter login result: ", resultLogin);
+
+      if (!resultLogin) {
+        // elizaLogger.error("Error checking cookies:", e);
         throw new AppError(`INVALID_COOKIES`, 200);
       }
 
