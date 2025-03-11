@@ -1,10 +1,10 @@
 import express from "express";
-import { elizaLogger, validateCharacterConfig } from "@elizaos/core";
+import { Clients, elizaLogger, getEnvVariable, validateCharacterConfig } from "@elizaos/core";
 import db from "../../models/index.js";
 import { stringToUuid } from "@elizaos/core";
 import { GoalType } from "../../database/enum-database.js";
 import { goalsToElizaGoals, personalityToCharacter } from "../../services/openAiService.js";
-import { TwitterCheckOnly } from "foru-client-twitter";
+import TwitterClientInterface, { TwitterCheckOnly } from "foru-client-twitter";
 import { AppError } from "../../utils/errors.js";
 
 const router = express.Router();
@@ -47,11 +47,6 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
         TWITTER_COOKIES_GUEST_ID: guest_id, 
         TWITTER_COOKIES_AUTH_TOKEN: auth_token 
       } = req.body.cookies;
-
-      agent.character.settings.secrets = {
-        ...agent.character.settings.secrets,
-        ...req.body.cookies
-      };
       
       agent.character.settings.secrets.TWITTER_SOCKS_PROXY = "socks5://rduuoqxa-id-2300:87njuuziu5v6@p.webshare.io:80"
       const resultLogin = await TwitterCheckOnly.checkCookies(
@@ -105,6 +100,7 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
         );
       }
 
+      character.clients.push(Clients.TWITTER);
       await db.CharacterConfig.update(
         { character, updatedAt: new Date() },
         { where: { name: character.name } }
@@ -122,7 +118,11 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       // (Assuming startAgent returns a promise for a new agent)
       agent = await directClient.startAgent(character);
       elizaLogger.log(`${character.name} started`);
-
+      
+      const twitterClients = await TwitterClientInterface.start(agent);
+      agent.clients.push(twitterClients);
+      elizaLogger.log(`${character.name} twitter client started`);
+      
       res.json({ id: character.id, success: true, character });
     } catch (e) {
       elizaLogger.error(`Error processing cookies update: ${e}`);
