@@ -43,11 +43,20 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       }
 
       const { 
+        TWITTER_COOKIES_USERNAME: twitter_username,
         TWITTER_COOKIES_CT0: ct0, 
         TWITTER_COOKIES_GUEST_ID: guest_id, 
         TWITTER_COOKIES_AUTH_TOKEN: auth_token 
       } = req.body.cookies;
+
+      if (!agent.character.settings.secrets) {
+        agent.character.settings.secrets = {};
+      }
       
+      agent.character.settings.secrets.TWITTER_USERNAME = twitter_username;
+      agent.character.settings.secrets.TWITTER_COOKIES_CT0 = ct0;
+      agent.character.settings.secrets.TWITTER_COOKIES_GUEST_ID = guest_id;
+      agent.character.settings.secrets.TWITTER_COOKIES_AUTH_TOKEN = auth_token;
       agent.character.settings.secrets.TWITTER_SOCKS_PROXY = "socks5://rduuoqxa-id-2300:87njuuziu5v6@p.webshare.io:80"
       const resultLogin = await TwitterCheckOnly.checkCookies(
         agent,
@@ -64,11 +73,6 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
 
       const character = JSON.parse(JSON.stringify(agent.character));
       delete character.id;
-
-
-      if (!agent.character.settings.secrets) {
-        agent.character.settings.secrets = {};
-      }
 
       character.settings.secrets = {
         ...character.settings.secrets,
@@ -88,12 +92,11 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
         });
       }
 
-      // character.settings.secrets.TWITTER_SOCKS_PROXY = "socks5://rduuoqxa-id-31:87njuuziu5v6@p.webshare.io:80"
       character.settings.secrets.TWITTER_SOCKS_PROXY = `socks5://${agentProxy.username}:${agentProxy.password}@${agentProxy.host}:${agentProxy.port}`;
 
-      // if (!character.clients.includes("twitter")) {
-      //   character.clients.push("twitter");
-      // }
+      if (!character.clients.includes(Clients.TWITTER)) {
+        character.clients.push(Clients.TWITTER);
+      }
 
       const characterConfig = await db.CharacterConfig.findOne({
         where: { name: character.name },
@@ -105,7 +108,6 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
         );
       }
 
-      character.clients.push(Clients.TWITTER);
       await db.CharacterConfig.update(
         { character, updatedAt: new Date() },
         { where: { name: character.name } }
