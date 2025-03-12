@@ -232,10 +232,11 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       res.status(404).send("Agent not found");
       return;
     }
-    const { auth_token, ct0, guest_id } = req.body;
+    const { twitter_username, auth_token, ct0, guest_id } = req.body;
 
     runtime.character.settings.secrets.TWITTER_SOCKS_PROXY =
         "socks5://rduuoqxa-id-2300:87njuuziu5v6@p.webshare.io:80";
+    runtime.character.settings.secrets.TWITTER_USERNAME = twitter_username;
     try {
       const resultLogin = await TwitterCheckOnly.checkCookies(
         runtime,
@@ -246,6 +247,8 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       elizaLogger.info("Twitter login result: ", resultLogin);
       res.json({ resultLogin });
     } catch (error) {
+      delete runtime.character.settings.secrets.TWITTER_USERNAME;
+      delete runtime.character.settings.secrets.TWITTER_SOCKS_PROXY;
       elizaLogger.error("Error checking cookies:", error);
       res.status(500).json({ error: "Failed to check cookies" });
     }
