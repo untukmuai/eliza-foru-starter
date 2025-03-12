@@ -65,6 +65,11 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       const character = JSON.parse(JSON.stringify(agent.character));
       delete character.id;
 
+
+      if (!agent.character.settings.secrets) {
+        agent.character.settings.secrets = {};
+      }
+
       character.settings.secrets = {
         ...character.settings.secrets,
         ...req.body.cookies
@@ -233,10 +238,16 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       return;
     }
     const { twitter_username, auth_token, ct0, guest_id } = req.body;
-
+    if (!runtime.character.settings.secrets) {
+      runtime.character.settings.secrets = {};
+    }
     runtime.character.settings.secrets.TWITTER_SOCKS_PROXY =
         "socks5://rduuoqxa-id-2300:87njuuziu5v6@p.webshare.io:80";
     runtime.character.settings.secrets.TWITTER_USERNAME = twitter_username;
+    runtime.character.settings.secrets.TWITTER_COOKIES_CT0 = ct0;
+    runtime.character.settings.secrets.TWITTER_COOKIES_GUEST_ID = guest_id;
+    runtime.character.settings.secrets.TWITTER_COOKIES_AUTH_TOKEN = auth_token;
+
     try {
       const resultLogin = await TwitterCheckOnly.checkCookies(
         runtime,
@@ -247,6 +258,9 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       elizaLogger.info("Twitter login result: ", resultLogin);
       res.json({ resultLogin });
     } catch (error) {
+      delete runtime.character.settings.secrets.TWITTER_COOKIES_CT0;
+      delete runtime.character.settings.secrets.TWITTER_COOKIES_GUEST_ID;
+      delete runtime.character.settings.secrets.TWITTER_COOKIES_AUTH_TOKEN;
       delete runtime.character.settings.secrets.TWITTER_USERNAME;
       delete runtime.character.settings.secrets.TWITTER_SOCKS_PROXY;
       elizaLogger.error("Error checking cookies:", error);
