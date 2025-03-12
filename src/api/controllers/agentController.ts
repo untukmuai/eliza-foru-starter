@@ -233,6 +233,9 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       return;
     }
     const { auth_token, ct0, guest_id } = req.body;
+
+    runtime.character.settings.secrets.TWITTER_SOCKS_PROXY =
+        "socks5://rduuoqxa-id-2300:87njuuziu5v6@p.webshare.io:80";
     try {
       const resultLogin = await TwitterCheckOnly.checkCookies(
         runtime,
