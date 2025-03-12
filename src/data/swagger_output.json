@@ -385,6 +385,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "twitter_username": {
+                    "type": "string",
+                    "example": "your_auth_token"
+                  },
                   "auth_token": {
                     "type": "string",
                     "example": "your_auth_token"
@@ -398,7 +402,7 @@
                     "example": "your_guest_id"
                   }
                 },
-                "required": ["auth_token", "ct0", "guest_id"]
+                "required": ["twitter_username", "auth_token", "ct0", "guest_id"]
               }
             }
           }
