@@ -8,7 +8,7 @@ import { messageHandlerTemplate } from "./controllers/messageController.js";
 
 class DirectApi {
   app: express.Application;
-  agents: Map<any, any>;
+  agents: Map<any, IAgentRuntime>;
   server: any;
   startAgent: any;
 

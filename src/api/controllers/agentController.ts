@@ -1,5 +1,5 @@
 import express from "express";
-import { Clients, elizaLogger, getEnvVariable, validateCharacterConfig } from "@elizaos/core";
+import { Clients, elizaLogger, getEnvVariable, IAgentRuntime, validateCharacterConfig } from "@elizaos/core";
 import db from "../../models/index.js";
 import { stringToUuid } from "@elizaos/core";
 import { GoalType } from "../../database/enum-database.js";
@@ -10,7 +10,7 @@ import DirectApi from "../DirectApi.js";
 
 const router = express.Router();
 
-const agentsRoutes = (agents: Map<any, any>, directClient: DirectApi) => {
+const agentsRoutes = (agents: Map<any, IAgentRuntime>, directClient: DirectApi) => {
   // GET /agents — list all agents
   router.get("/agents", (req, res) => {
     const agentsList = Array.from(agents.values()).map((agent) => ({
@@ -120,7 +120,7 @@ const agentsRoutes = (agents: Map<any, any>, directClient: DirectApi) => {
       );
 
       if (agent) {
-        agent.stop();
+        // agent.stop();
         directClient.unregisterAgent(agent);
       }
       // (Assuming startAgent returns a promise for a new agent)
@@ -148,7 +148,7 @@ const agentsRoutes = (agents: Map<any, any>, directClient: DirectApi) => {
   router.post("/agents/:agentId/set", async (req, res) => {
     const agentId = req.params.agentId;
     elizaLogger.debug(`Update character config: ${agentId}`);
-    let agent = await agents.get(agentId);
+    let agent = agents.get(agentId);
     const character = req.body;
     try {
       elizaLogger.debug(`Validate character config payload: ${character.name}`);
@@ -171,7 +171,7 @@ const agentsRoutes = (agents: Map<any, any>, directClient: DirectApi) => {
       elizaLogger.info(`CharacterConfig updated: ${character.name}`);
 
       if (agent) {
-        agent.stop();
+        // agent.stop();
         directClient.unregisterAgent(agent);
       }
       // (Assuming startAgent returns a promise for a new agent)

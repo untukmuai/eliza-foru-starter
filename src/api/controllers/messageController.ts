@@ -11,6 +11,8 @@ import {
   ModelClass,
   getEmbeddingZeroVector,
   GoalStatus,
+  IAgentRuntime,
+  UUID,
 } from "@elizaos/core";
 import { elizaLogger } from "@elizaos/core";
 import { stringToUuid as stringToUuid2 } from "@elizaos/core";
@@ -78,7 +80,7 @@ Note that {{agentName}} is capable of reading/seeing/hearing various forms of me
 const router = express.Router();
 
 const messageRoutes = (
-  agents: Map<any, any>,
+  agents: Map<any, IAgentRuntime>,
   directClient: DirectApi,
   messageHandlerTemplate
 ) => {
@@ -129,6 +131,7 @@ const messageRoutes = (
     await autoCreateGoals(dbRuntime, roomId, userId, agentConfigSecondary);
 
     const secondaryGoalList = await dbRuntime.getGoals({
+      agentId: agentId as UUID,
       roomId,
       userId,
     });

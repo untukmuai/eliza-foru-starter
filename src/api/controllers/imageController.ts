@@ -1,10 +1,10 @@
 // controllers/imageController.js
 import express from "express";
-import { generateImage, generateCaption } from "@elizaos/core";
+import { generateImage, generateCaption, IAgentRuntime } from "@elizaos/core";
 
 const router = express.Router();
 
-const imageRoutes = (agents) => {
+const imageRoutes = (agents: Map<any, IAgentRuntime>) => {
   router.post("/:agentId/image", async (req, res) => {
     const agentId = req.params.agentId;
     const agent = agents.get(agentId);
@@ -29,6 +29,6 @@ const imageRoutes = (agents) => {
     res.json({ images: imagesRes });
   });
   return router;
-}
+};
 
 export default imageRoutes;

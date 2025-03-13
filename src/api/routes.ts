@@ -7,7 +7,7 @@ import agentsRoutes from "./controllers/agentController.js";
 import imageRoutes from "./controllers/imageController.js";
 import { messageRoutes } from "./controllers/messageController.js";
 import basicAuth from "express-basic-auth";
-import { getEnvVariable } from "@elizaos/core";
+import { getEnvVariable, IAgentRuntime } from "@elizaos/core";
 import DirectApi from "./DirectApi.js";
 
 
@@ -30,7 +30,7 @@ function apiKeyMiddleware(req, res, next) {
   next();
 }
 
-export function createApiRoutes(agents, directClient: DirectApi, messageHandlerTemplate) {
+export function createApiRoutes(agents: Map<any, IAgentRuntime>, directClient: DirectApi, messageHandlerTemplate) {
   const router = express.Router();
   router.use(express.json());
   router.use(express.urlencoded({ extended: true }));
