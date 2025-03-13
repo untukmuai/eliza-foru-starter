@@ -43,7 +43,7 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       }
 
       const { 
-        TWITTER_COOKIES_USERNAME: twitter_username,
+        TWITTER_USERNAME: twitter_username,
         TWITTER_COOKIES_CT0: ct0, 
         TWITTER_COOKIES_GUEST_ID: guest_id, 
         TWITTER_COOKIES_AUTH_TOKEN: auth_token 
