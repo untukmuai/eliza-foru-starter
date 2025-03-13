@@ -8,6 +8,7 @@ import imageRoutes from "./controllers/imageController.js";
 import { messageRoutes } from "./controllers/messageController.js";
 import basicAuth from "express-basic-auth";
 import { getEnvVariable } from "@elizaos/core";
+import DirectApi from "./DirectApi.js";
 
 
 const users = { developer: "foruweb3project@2024" };
@@ -29,7 +30,7 @@ function apiKeyMiddleware(req, res, next) {
   next();
 }
 
-export function createApiRoutes(agents, directClient, messageHandlerTemplate) {
+export function createApiRoutes(agents, directClient: DirectApi, messageHandlerTemplate) {
   const router = express.Router();
   router.use(express.json());
   router.use(express.urlencoded({ extended: true }));

@@ -22,6 +22,7 @@ import {
 } from "../../services/goalManagementServices.ts";
 import { greetings } from "../../services/openAiService.js";
 import { character } from "../../character.ts";
+import DirectApi from "../DirectApi.ts";
 
 // Configure multer storage for file uploads
 const storage = multer.diskStorage({
@@ -78,7 +79,7 @@ const router = express.Router();
 
 const messageRoutes = (
   agents: Map<any, any>,
-  directClient,
+  directClient: DirectApi,
   messageHandlerTemplate
 ) => {
   router.post("/:agentId/message", upload.single("file"), async (req, res) => {

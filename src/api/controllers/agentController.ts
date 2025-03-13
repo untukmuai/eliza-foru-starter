@@ -6,10 +6,11 @@ import { GoalType } from "../../database/enum-database.js";
 import { goalsToElizaGoals, personalityToCharacter } from "../../services/openAiService.js";
 import TwitterClientInterface, { TwitterCheckOnly } from "foru-client-twitter";
 import { AppError } from "../../utils/errors.js";
+import DirectApi from "../DirectApi.js";
 
 const router = express.Router();
 
-const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
+const agentsRoutes = (agents: Map<any, any>, directClient: DirectApi) => {
   // GET /agents — list all agents
   router.get("/agents", (req, res) => {
     const agentsList = Array.from(agents.values()).map((agent) => ({
@@ -124,6 +125,7 @@ const agentsRoutes = (agents: Map<any, any>, directClient: any) => {
       }
       // (Assuming startAgent returns a promise for a new agent)
       agent = await directClient.startAgent(character);
+      directClient.registerAgent(agent);
       elizaLogger.log(`${character.name} started`);
       
       const twitterClients = await TwitterClientInterface.start(agent);

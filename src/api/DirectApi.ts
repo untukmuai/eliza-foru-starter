@@ -3,7 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import path from "path";
 import { createApiRoutes } from "./routes.js";
-import { elizaLogger } from "@elizaos/core";
+import { elizaLogger, IAgentRuntime } from "@elizaos/core";
 import { messageHandlerTemplate } from "./controllers/messageController.js";
 
 class DirectApi {
@@ -40,10 +40,10 @@ class DirectApi {
   }
 
   // Methods for agent registration management
-  registerAgent(runtime) {
+  registerAgent(runtime: IAgentRuntime) {
     this.agents.set(runtime.agentId, runtime);
   }
-  unregisterAgent(runtime) {
+  unregisterAgent(runtime: IAgentRuntime) {
     this.agents.delete(runtime.agentId);
   }
 
