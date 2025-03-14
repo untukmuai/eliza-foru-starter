@@ -50,6 +50,13 @@ const agentsRoutes = (agents: Map<any, IAgentRuntime>, directClient: DirectApi) 
         TWITTER_COOKIES_AUTH_TOKEN: auth_token 
       } = req.body.cookies;
 
+
+      if (!agent.character.settings) {
+        agent.character.settings = {
+          embeddingModel: "all-MiniLM-L6-v2",
+          ragKnowledge: true,
+        };
+      }
       if (!agent.character.settings.secrets) {
         agent.character.settings.secrets = {};
       }
