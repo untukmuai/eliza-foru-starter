@@ -173,7 +173,15 @@ const startAgents = async () => {
       }
       return startAgent(character, directApi as DirectApi);
     });
-    await Promise.all(startPromises);
+    const startResults = await Promise.allSettled(startPromises);
+    startResults.forEach((result, index) => {
+      if (result.status === "rejected") {
+        elizaLogger.error(
+          `Error starting agent ${characters[index].name}:`,
+          result.reason
+        );
+      }
+    });
   } catch (error) {
     elizaLogger.error("Error starting agents concurrently:", error);
   }
