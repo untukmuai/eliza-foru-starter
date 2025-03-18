@@ -1,5 +1,11 @@
 import express from "express";
-import { Clients, elizaLogger, getEnvVariable, IAgentRuntime, validateCharacterConfig } from "@elizaos/core";
+import {
+  Clients,
+  Client,
+  elizaLogger,
+  IAgentRuntime,
+  validateCharacterConfig,
+} from "@elizaos/core";
 import db from "../../models/index.js";
 import { stringToUuid } from "@elizaos/core";
 import { GoalType } from "../../database/enum-database.js";
@@ -60,12 +66,27 @@ const agentsRoutes = (agents: Map<any, IAgentRuntime>, directClient: DirectApi) 
       if (!agent.character.settings.secrets) {
         agent.character.settings.secrets = {};
       }
-      
+
+      let updateAgent: boolean = false;
+      let agentProxy = await db.AgentProxy.findOne({
+        where: { agentId: agentId },
+        attributes: ["id", "host", "port", "username", "password"],
+        raw: true,
+      });
+      if (!agentProxy) {
+        updateAgent = true;
+        agentProxy = await db.AgentProxy.findOne({
+          where: { agentId: null },
+          attributes: ["id", "host", "port", "username", "password"],
+          raw: true,
+        });
+      }
+
       agent.character.settings.secrets.TWITTER_USERNAME = twitter_username;
       agent.character.settings.secrets.TWITTER_COOKIES_CT0 = ct0;
       agent.character.settings.secrets.TWITTER_COOKIES_GUEST_ID = guest_id;
       agent.character.settings.secrets.TWITTER_COOKIES_AUTH_TOKEN = auth_token;
-      agent.character.settings.secrets.TWITTER_SOCKS_PROXY = "socks5://rduuoqxa-id-2300:87njuuziu5v6@p.webshare.io:80"
+      agent.character.settings.secrets.TWITTER_SOCKS_PROXY = `socks5://${agentProxy.username}:${agentProxy.password}@${agentProxy.host}:${agentProxy.port}`;
       const resultLogin = await TwitterCheckOnly.checkCookies(
         agent,
         auth_token,
@@ -86,23 +107,6 @@ const agentsRoutes = (agents: Map<any, IAgentRuntime>, directClient: DirectApi) 
         ...character.settings.secrets,
         ...req.body.cookies
       };
-
-      let updateAgent: boolean = false;
-      let agentProxy = await db.AgentProxy.findOne({
-        where: { agentId: agentId },
-        attributes: ["id", "host", "port", "username", "password"],
-        raw: true
-      });
-      if (!agentProxy) {
-        updateAgent = true;
-        agentProxy = await db.AgentProxy.findOne({
-          where: { agentId: null },
-          attributes: ["id", "host", "port", "username", "password"],
-          raw: true
-        });
-      }
-
-      character.settings.secrets.TWITTER_SOCKS_PROXY = `socks5://${agentProxy.username}:${agentProxy.password}@${agentProxy.host}:${agentProxy.port}`;
 
       if (!character.clients.includes(Clients.TWITTER)) {
         character.clients.push(Clients.TWITTER);
@@ -132,6 +136,11 @@ const agentsRoutes = (agents: Map<any, IAgentRuntime>, directClient: DirectApi) 
         
 
       if (agent) {
+        for (let client of Object.values(agent.clients)) {
+          if (isClient(client)) {
+            client.stop(agent);
+          }
+        }
         // agent.stop();
         directClient.unregisterAgent(agent);
       }
@@ -155,6 +164,10 @@ const agentsRoutes = (agents: Map<any, IAgentRuntime>, directClient: DirectApi) 
       });
     };
   });
+
+  function isClient(obj: any): obj is Client {
+    return typeof obj.stop === "function"; // Check if it has a `stop()` method
+  }
 
   // POST /agents/:agentId/set — update an agent’s character config
   router.post("/agents/:agentId/set", async (req, res) => {
