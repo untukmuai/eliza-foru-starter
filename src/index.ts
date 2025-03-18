@@ -165,6 +165,7 @@ const startAgents = async () => {
           presence_penalty: 0.1,
         },
         embeddingModel: "all-MiniLM-L6-v2",
+        ragKnowledge: true,
       };
 
       if (getEnvVariable("DISABLE_ALL_CLIENTS_INTERACTION", "false") === "true") {
