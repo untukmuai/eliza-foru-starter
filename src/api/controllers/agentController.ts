@@ -87,12 +87,14 @@ const agentsRoutes = (agents: Map<any, IAgentRuntime>, directClient: DirectApi) 
         ...req.body.cookies
       };
 
+      let updateAgent: boolean = false;
       let agentProxy = await db.AgentProxy.findOne({
         where: { agentId: agentId },
         attributes: ["id", "host", "port", "username", "password"],
         raw: true
       });
       if (!agentProxy) {
+        updateAgent = true;
         agentProxy = await db.AgentProxy.findOne({
           where: { agentId: null },
           attributes: ["id", "host", "port", "username", "password"],
@@ -121,10 +123,13 @@ const agentsRoutes = (agents: Map<any, IAgentRuntime>, directClient: DirectApi) 
         { where: { name: character.name } }
       );
 
-      await db.AgentProxy.update(
-        { agentId: agentId, updatedAt: new Date() },
-        { where: { id: agentProxy.id } }
-      );
+      if (updateAgent){
+        await db.AgentProxy.update(
+          { agentId: agentId, updatedAt: new Date() },
+          { where: { id: agentProxy.id } }
+        );
+      }
+        
 
       if (agent) {
         // agent.stop();
