@@ -81,8 +81,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       foru-client-twitter:
-        specifier: git+ssh://git@github.com:untukmuai/foru-client-twitter.git#41461c597224eecbc8a6a46a456ed088d5fa1eb7
-        version: '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#41461c597224eecbc8a6a46a456ed088d5fa1eb7(@google-cloud/vertexai@1.9.2)(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(@langchain/groq@0.1.3(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(bufferutil@4.0.9)(react@19.0.0)(sswr@2.1.0(svelte@5.18.0))(svelte@5.18.0)(utf-8-validate@5.0.10)(vue@3.5.13(typescript@5.6.3))(whatwg-url@7.1.0)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))'
+        specifier: git+ssh://git@github.com:untukmuai/foru-client-twitter.git#90ed2ad8718d1b22800f270750613234496d7bfd
+        version: '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#90ed2ad8718d1b22800f270750613234496d7bfd(@google-cloud/vertexai@1.9.2)(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(@langchain/groq@0.1.3(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(bufferutil@4.0.9)(react@19.0.0)(sswr@2.1.0(svelte@5.18.0))(svelte@5.18.0)(utf-8-validate@5.0.10)(vue@3.5.13(typescript@5.6.3))(whatwg-url@7.1.0)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))'
       multer:
         specifier: 1.4.5-lts.1
         version: 1.4.5-lts.1
@@ -996,8 +996,8 @@ packages:
   '@elizaos/client-telegram@0.1.9':
     resolution: {integrity: sha512-gTpaM7GRWEy/Vsl0626mYE2dzlE5i7Zec9DjYYUkAYLT/R5Ibep8dkgHQOA+xWPG6H04fk1ZotdYPiBpyuJxZQ==}
 
-  '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#41461c597224eecbc8a6a46a456ed088d5fa1eb7':
-    resolution: {commit: 41461c597224eecbc8a6a46a456ed088d5fa1eb7, repo: git@github.com:untukmuai/foru-client-twitter.git, type: git}
+  '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#90ed2ad8718d1b22800f270750613234496d7bfd':
+    resolution: {commit: 90ed2ad8718d1b22800f270750613234496d7bfd, repo: git@github.com:untukmuai/foru-client-twitter.git, type: git}
     version: 0.1.9
     peerDependencies:
       whatwg-url: 7.1.0
@@ -5112,6 +5112,9 @@ packages:
   fetch-cookie@3.1.0:
     resolution: {integrity: sha512-s/XhhreJpqH0ftkGVcQt8JE9bqk+zRn4jF5mPJXWZeQMCI5odV9K+wEWYbnzFPHgQZlvPSMjS4n4yawWE8RINw==}
 
+  fetch-socks@1.3.2:
+    resolution: {integrity: sha512-vkH5+Zgj2yEbU57Cei0iyLgTZ4OkEKJj56Xu3ViB5dpsl599JgEooQ3x6NVagIFRHWnWJ+7K0MO0aIV1TMgvnw==}
+
   ffmpeg-static@5.2.0:
     resolution: {integrity: sha512-WrM7kLW+do9HLr+H6tk7LzQ7kPqbAgLjdzNE32+u3Ff11gXt9Kkkd2nusGFrlWMIe+XaA97t+I8JS7sZIrvRgA==}
     engines: {node: '>=16'}
@@ -7712,6 +7715,10 @@ packages:
     resolution: {integrity: sha512-l5x7VUUWbjVFbafGLxPWkYsHIhEvmF85tbIeFZWc8ZPtoMyybuEhL7Jye/ooC4/d48FgOjSJXgsF/AJPYCW8Zw==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
 
+  socks@2.8.4:
+    resolution: {integrity: sha512-D3YaD0aRxR3mEcqnidIs7ReYJFVzWdd6fXJYUM8ixcQcJRGTka/b3saV0KflYhyVJXKhb947GndU35SxYNResQ==}
+    engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
+
   sodium-native@3.4.1:
     resolution: {integrity: sha512-PaNN/roiFWzVVTL6OqjzYct38NSXewdl2wz8SRB51Br/MLIJPrbM3XexhVWkq7D3UWMysfrhKVf1v1phZq6MeQ==}
 
@@ -8370,8 +8377,8 @@ packages:
     resolution: {integrity: sha512-U8uCCl2x9TK3WANvmBavymRzxbfFYG+tAu+fgx3zxQy3qdagQqBLwJVrdyO1TBfUXvfKveMKJZhpvUYoOjM+4g==}
     engines: {node: '>=18.17'}
 
-  undici@7.3.0:
-    resolution: {integrity: sha512-Qy96NND4Dou5jKoSJ2gm8ax8AJM/Ey9o9mz7KN1bb9GP+G0l20Zw8afxTnY2f4b7hmhn/z8aC2kfArVQlAhFBw==}
+  undici@7.5.0:
+    resolution: {integrity: sha512-NFQG741e8mJ0fLQk90xKxFdaSM7z4+IQpAgsFI36bCDY9Z2+aXXZjVy2uUksMouWfMI9+w5ejOq5zYYTBCQJDQ==}
     engines: {node: '>=20.18.1'}
 
   unfetch@4.2.0:
@@ -10927,13 +10934,15 @@ snapshots:
       - vue
       - ws
 
-  '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#41461c597224eecbc8a6a46a456ed088d5fa1eb7(@google-cloud/vertexai@1.9.2)(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(@langchain/groq@0.1.3(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(bufferutil@4.0.9)(react@19.0.0)(sswr@2.1.0(svelte@5.18.0))(svelte@5.18.0)(utf-8-validate@5.0.10)(vue@3.5.13(typescript@5.6.3))(whatwg-url@7.1.0)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+  '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#90ed2ad8718d1b22800f270750613234496d7bfd(@google-cloud/vertexai@1.9.2)(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(@langchain/groq@0.1.3(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(bufferutil@4.0.9)(react@19.0.0)(sswr@2.1.0(svelte@5.18.0))(svelte@5.18.0)(utf-8-validate@5.0.10)(vue@3.5.13(typescript@5.6.3))(whatwg-url@7.1.0)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@elizaos/core': 0.1.9(@google-cloud/vertexai@1.9.2)(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(@langchain/groq@0.1.3(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(react@19.0.0)(sswr@2.1.0(svelte@5.18.0))(svelte@5.18.0)(vue@3.5.13(typescript@5.6.3))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       agent-twitter-client: 0.0.18(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       discord.js: 14.16.3(bufferutil@4.0.9)(utf-8-validate@5.0.10)
+      fetch-socks: 1.3.2
       glob: 11.0.0
-      socks-proxy-agent: 8.0.5
+      socks: 2.8.4
+      undici: 7.5.0
       whatwg-url: 7.1.0
       zod: 3.23.8
     transitivePeerDependencies:
@@ -14747,14 +14756,6 @@ snapshots:
       - fastestsmallesttextencoderdecoder
       - typescript
 
-  '@solana/spl-token-group@0.0.7(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)':
-    dependencies:
-      '@solana/codecs': 2.0.0-rc.1(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)
-      '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-    transitivePeerDependencies:
-      - fastestsmallesttextencoderdecoder
-      - typescript
-
   '@solana/spl-token-group@0.0.7(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)':
     dependencies:
       '@solana/codecs': 2.0.0-rc.1(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)
@@ -14922,8 +14923,8 @@ snapshots:
     dependencies:
       '@solana/buffer-layout': 4.0.1
       '@solana/buffer-layout-utils': 0.2.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
-      '@solana/spl-token-group': 0.0.7(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)
-      '@solana/spl-token-metadata': 0.1.6(@solana/web3.js@1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)
+      '@solana/spl-token-group': 0.0.7(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)
+      '@solana/spl-token-metadata': 0.1.6(@solana/web3.js@1.98.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.6.3)
       '@solana/web3.js': 1.95.8(bufferutil@4.0.9)(utf-8-validate@5.0.10)
       buffer: 6.0.3
     transitivePeerDependencies:
@@ -15764,7 +15765,7 @@ snapshots:
       tough-cookie: 4.1.4
       tslib: 2.8.1
       twitter-api-v2: 1.20.2
-      undici: 7.3.0
+      undici: 7.5.0
       ws: 8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
       - bufferutil
@@ -17511,6 +17512,11 @@ snapshots:
     dependencies:
       set-cookie-parser: 2.7.1
       tough-cookie: 5.1.0
+
+  fetch-socks@1.3.2:
+    dependencies:
+      socks: 2.8.4
+      undici: 7.5.0
 
   ffmpeg-static@5.2.0:
     dependencies:
@@ -20506,6 +20512,11 @@ snapshots:
       ip-address: 9.0.5
       smart-buffer: 4.2.0
 
+  socks@2.8.4:
+    dependencies:
+      ip-address: 9.0.5
+      smart-buffer: 4.2.0
+
   sodium-native@3.4.1:
     dependencies:
       node-gyp-build: 4.8.4
@@ -21303,7 +21314,7 @@ snapshots:
 
   undici@6.19.8: {}
 
-  undici@7.3.0: {}
+  undici@7.5.0: {}
 
   unfetch@4.2.0: {}
 
