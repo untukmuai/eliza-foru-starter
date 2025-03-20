@@ -5,9 +5,10 @@ export function initializeDatabase() {
   if (process.env.POSTGRES_URL) {
     const db = new PostgresDatabaseAdapter({
       connectionString: process.env.POSTGRES_URL,
-      allowExitOnIdle: true,
-      max: 2,
-      idleTimeoutMillis: 1000,
+      allowExitOnIdle: false,
+      max: 100,
+      idleTimeoutMillis: 10000,
+      connectionTimeoutMillis: 30000,
     });
     return db;
   } else {
