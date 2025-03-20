@@ -3,7 +3,7 @@ import { CacheManager, Character, DbCacheAdapter, IDatabaseCacheAdapter } from "
 
 export function initializeDbCache(
   character: Character,
-  db: IDatabaseCacheAdapter
+  db: any
 ) {
   const cache = new CacheManager(new DbCacheAdapter(db, character.id));
   return cache;

@@ -72,7 +72,6 @@ export function createAgent(
 
 async function startAgent(
   db: IDatabaseAdapter,
-  cache: ICacheManager,
   character: Character,
   directApi: DirectApi
 ) {
@@ -81,6 +80,8 @@ async function startAgent(
     character.username ??= character.name;
 
     const token = getTokenForProvider(character.modelProvider, character);
+
+    const cache = initializeDbCache(character, db);
 
     const runtime = createAgent(character, db, cache, token);
 
@@ -158,7 +159,6 @@ const startAgents = async () => {
   
   const db = initializeDatabase();
   await db.init();
-  const cache = initializeDbCache(character, db);
 
   console.log("characters", characters);
   try {
@@ -183,7 +183,7 @@ const startAgents = async () => {
           console.log("Disabling all clients interaction");
           character.clients = [Clients.DIRECT];
         }
-        return startAgent(db, cache, character, directApi);
+        return startAgent(db, character, directApi);
       })
     );
     const startResults = await Promise.allSettled(startPromises);
@@ -205,7 +205,7 @@ const startAgents = async () => {
   }
 
   directApi.startAgent = async (character: Character) => {
-    return startAgent(db, cache, character, directApi);
+    return startAgent(db, character, directApi);
   };
 
   directApi.start(serverPort);
