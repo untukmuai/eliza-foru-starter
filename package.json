@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@elizaos/adapter-postgres": "0.1.9",
-    "@elizaos/adapter-sqlite": "0.1.9",
     "@elizaos/client-auto": "0.1.9",
     "@elizaos/client-discord": "0.1.9",
     "@elizaos/client-telegram": "0.1.9",

@@ -4,6 +4,8 @@ import {
   Clients,
   elizaLogger,
   getEnvVariable,
+  ICacheManager,
+  IDatabaseAdapter,
   ModelProviderName,
   settings,
   stringToUuid,
@@ -36,8 +38,8 @@ let nodePlugin: any | undefined;
 
 export function createAgent(
   character: Character,
-  db: any,
-  cache: any,
+  db: IDatabaseAdapter,
+  cache: ICacheManager,
   token: string
 ) {
   elizaLogger.success(
@@ -68,18 +70,18 @@ export function createAgent(
   });
 }
 
-async function startAgent(character: Character, directApi: DirectApi) {
+async function startAgent(
+  db: IDatabaseAdapter,
+  cache: ICacheManager,
+  character: Character,
+  directApi: DirectApi
+) {
   try {
     character.id ??= stringToUuid(character.name);
     character.username ??= character.name;
 
     const token = getTokenForProvider(character.modelProvider, character);
 
-    const db = initializeDatabase();
-
-    await db.init();
-
-    const cache = initializeDbCache(character, db);
     const runtime = createAgent(character, db, cache, token);
 
     await runtime.initialize();
@@ -154,9 +156,13 @@ const startAgents = async () => {
     throw new Error("No characters loaded");
   }
   
+  const db = initializeDatabase();
+  await db.init();
+  const cache = initializeDbCache(character, db);
+
   console.log("characters", characters);
   try {
-    const limit = pLimit(10);
+    const limit = pLimit(50);
     const startPromises = characters.map((character) =>
       limit(async () => {
         character.modelProvider ??= ModelProviderName.OPENAI;
@@ -177,7 +183,7 @@ const startAgents = async () => {
           console.log("Disabling all clients interaction");
           character.clients = [Clients.DIRECT];
         }
-        return startAgent(character, directApi);
+        return startAgent(db, cache, character, directApi);
       })
     );
     const startResults = await Promise.allSettled(startPromises);
@@ -199,7 +205,7 @@ const startAgents = async () => {
   }
 
   directApi.startAgent = async (character: Character) => {
-    return startAgent(character, directApi);
+    return startAgent(db, cache, character, directApi);
   };
 
   directApi.start(serverPort);

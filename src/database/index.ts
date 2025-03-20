@@ -6,7 +6,7 @@ export function initializeDatabase() {
     const db = new PostgresDatabaseAdapter({
       connectionString: process.env.POSTGRES_URL,
       allowExitOnIdle: true,
-      max: 5,
+      max: 1000,
       idleTimeoutMillis: 10000,
       connectionTimeoutMillis: 30000,
     });
