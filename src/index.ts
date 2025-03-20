@@ -24,6 +24,7 @@ import {
 } from "./config/index.ts";
 import { initializeDatabase } from "./database/index.ts";
 import DirectApi from "./api/DirectApi.ts";
+import pLimit from "p-limit";
 
 export const wait = (minTime: number = 1000, maxTime: number = 3000) => {
   const waitTime =
@@ -155,25 +156,30 @@ const startAgents = async () => {
   
   console.log("characters", characters);
   try {
-    const startPromises = characters.map((character) => {
-      character.modelProvider ??= ModelProviderName.OPENAI;
-      character.settings ??= {
-        modelConfig: {
-          temperature: 0.2,
-          max_response_length: 400,
-          frequency_penalty: 0.1,
-          presence_penalty: 0.1,
-        },
-        embeddingModel: "all-MiniLM-L6-v2",
-        ragKnowledge: true,
-      };
+    const limit = pLimit(10);
+    const startPromises = characters.map((character) =>
+      limit(async () => {
+        character.modelProvider ??= ModelProviderName.OPENAI;
+        character.settings ??= {
+          modelConfig: {
+            temperature: 0.2,
+            max_response_length: 400,
+            frequency_penalty: 0.1,
+            presence_penalty: 0.1,
+          },
+          embeddingModel: "all-MiniLM-L6-v2",
+          ragKnowledge: true,
+        };
 
-      if (getEnvVariable("DISABLE_ALL_CLIENTS_INTERACTION", "false") === "true") {
-        console.log("Disabling all clients interaction");
-        character.clients = [Clients.DIRECT];
-      }
-      return startAgent(character, directApi as DirectApi);
-    });
+        if (
+          getEnvVariable("DISABLE_ALL_CLIENTS_INTERACTION", "false") === "true"
+        ) {
+          console.log("Disabling all clients interaction");
+          character.clients = [Clients.DIRECT];
+        }
+        return startAgent(character, directApi);
+      })
+    );
     const startResults = await Promise.allSettled(startPromises);
     startResults.forEach((result, index) => {
       if (result.status === "rejected") {
