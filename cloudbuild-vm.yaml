@@ -1,0 +1,9 @@
+steps:
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      - '-c'
+      - | 
+      - set -x && \ gcloud compute ssh agent-core-dev --zone=asia-southeast1-a --command="cd /home/aliusman/agent-core-dev && git pull && docker-compose up -d"
+    id: Update dev server
+    entrypoint: /bin/bash
+    
