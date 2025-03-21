@@ -27,6 +27,7 @@ import {
 import { initializeDatabase } from "./database/index.ts";
 import DirectApi from "./api/DirectApi.ts";
 import pLimit from "p-limit";
+import PostgresDatabaseAdapter from "@elizaos/adapter-postgres";
 
 export const wait = (minTime: number = 1000, maxTime: number = 3000) => {
   const waitTime =
@@ -71,7 +72,7 @@ export function createAgent(
 }
 
 async function startAgent(
-  db: IDatabaseAdapter,
+  db: PostgresDatabaseAdapter,
   character: Character,
   directApi: DirectApi
 ) {

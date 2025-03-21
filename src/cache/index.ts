@@ -1,5 +1,6 @@
 
-import { CacheManager, Character, DbCacheAdapter, IDatabaseAdapter, IDatabaseCacheAdapter, UUID } from "@elizaos/core";
+import PostgresDatabaseAdapter from "@elizaos/adapter-postgres";
+import { CacheManager, Character, DbCacheAdapter, elizaLogger, IDatabaseAdapter, IDatabaseCacheAdapter, UUID } from "@elizaos/core";
 
 export function initializeDbCache(
   character: Character,
@@ -10,39 +11,61 @@ export function initializeDbCache(
 }
 
 export class PostgreSQLCacheAdapter implements IDatabaseCacheAdapter {
-  db: IDatabaseAdapter;
+  db: PostgresDatabaseAdapter;
 
-  constructor(db: IDatabaseAdapter) {
+  constructor(db: PostgresDatabaseAdapter) {
     this.db = db;
   }
 
-  getCache(params: {
+  async getCache(params: {
     agentId: UUID;
     key: string;
   }): Promise<string | undefined> {
-    this.db.db.query("SELECT * FROM cache WHERE agentId = $1 AND key = $2", [
-      params.agentId,
-      params.key,
-    ]);
-    return Promise.resolve("value");
+    try {
+      const result = await this.db.db.query(
+        "SELECT value::text AS value FROM cache WHERE agentId = $1 AND key = $2",
+        [params.agentId, params.key]
+      );
+
+      if (result.rows.length === 0) {
+        return undefined;
+      }
+
+      // Return the string result from the JSONB column
+      return result.rows[0].value;
+    } catch (error) {
+      elizaLogger.error("error getting cache using own PG Adapter ", error);
+      return undefined;
+    }
   }
-  setCache(params: {
+
+  async setCache(params: {
     agentId: UUID;
     key: string;
     value: string;
   }): Promise<boolean> {
-    this.db.db.query("INSERT INTO cache (agentId, key, value) VALUES ($1, $2, $3)", [
-      params.agentId,
-      params.key,
-      params.value,
-    ]);
-    return Promise.resolve(true);
+    try {
+      await this.db.db.query(
+        "INSERT INTO cache (agentId, key, value) VALUES ($1, $2, $3)",
+        [params.agentId, params.key, params.value]
+      );
+      return true;
+    } catch (error) {
+      elizaLogger.error('error setting cache using own PG Adapter ', error);
+      return false;
+    }
   }
-  deleteCache(params: { agentId: UUID; key: string }): Promise<boolean> {
-    this.db.db.query("DELETE FROM cache WHERE agentId = $1 AND key = $2", [
-      params.agentId,
-      params.key,
-    ]);
-    return Promise.resolve(true);
+
+  async deleteCache(params: { agentId: UUID; key: string }): Promise<boolean> {
+    try {
+      await this.db.db.query(
+        "DELETE FROM cache WHERE agentId = $1 AND key = $2",
+        [params.agentId, params.key]
+      );
+      return true;
+    } catch (error) {
+      elizaLogger.error("error delete cache using own PG Adapter ", error);
+      return false;
+    }
   }
 }
