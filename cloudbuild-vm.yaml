@@ -5,7 +5,7 @@ steps:
       - |
         gcloud compute ssh agent-core-dev \
           --zone=asia-southeast1-a \
-          --command='cd /home/aliusman/agent-core-dev && sudo pull.sh'
+          --command='cd /home/aliusman/agent-core-dev && sudo ./pull.sh'
     id: Update dev server
     entrypoint: /bin/bash
     
