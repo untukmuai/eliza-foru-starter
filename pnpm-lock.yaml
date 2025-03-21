@@ -78,8 +78,8 @@ importers:
         specifier: ^1.2.1
         version: 1.2.1
       foru-client-twitter:
-        specifier: git+ssh://git@github.com:untukmuai/foru-client-twitter.git#fc39f9b744cab3a0f258a1bea9a0626dc294e94c
-        version: '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#fc39f9b744cab3a0f258a1bea9a0626dc294e94c(@google-cloud/vertexai@1.9.2)(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(@langchain/groq@0.1.3(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(bufferutil@4.0.9)(react@19.0.0)(sswr@2.1.0(svelte@5.18.0))(svelte@5.18.0)(utf-8-validate@5.0.10)(vue@3.5.13(typescript@5.6.3))(whatwg-url@7.1.0)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))'
+        specifier: git+ssh://git@github.com:untukmuai/foru-client-twitter.git#bbe02ddb54654108935e5090d80b59f5a3e404b2
+        version: '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#bbe02ddb54654108935e5090d80b59f5a3e404b2(@google-cloud/vertexai@1.9.2)(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(@langchain/groq@0.1.3(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(bufferutil@4.0.9)(react@19.0.0)(sswr@2.1.0(svelte@5.18.0))(svelte@5.18.0)(utf-8-validate@5.0.10)(vue@3.5.13(typescript@5.6.3))(whatwg-url@7.1.0)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))'
       multer:
         specifier: 1.4.5-lts.1
         version: 1.4.5-lts.1
@@ -991,8 +991,8 @@ packages:
   '@elizaos/client-telegram@0.1.9':
     resolution: {integrity: sha512-gTpaM7GRWEy/Vsl0626mYE2dzlE5i7Zec9DjYYUkAYLT/R5Ibep8dkgHQOA+xWPG6H04fk1ZotdYPiBpyuJxZQ==}
 
-  '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#fc39f9b744cab3a0f258a1bea9a0626dc294e94c':
-    resolution: {commit: fc39f9b744cab3a0f258a1bea9a0626dc294e94c, repo: git@github.com:untukmuai/foru-client-twitter.git, type: git}
+  '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#bbe02ddb54654108935e5090d80b59f5a3e404b2':
+    resolution: {commit: bbe02ddb54654108935e5090d80b59f5a3e404b2, repo: git@github.com:untukmuai/foru-client-twitter.git, type: git}
     version: 0.1.9
     peerDependencies:
       whatwg-url: 7.1.0
@@ -7704,10 +7704,6 @@ packages:
     resolution: {integrity: sha512-HehCEsotFqbPW9sJ8WVYB6UbmIMv7kUUORIF2Nncq4VQvBfNBLibW9YZR5dlYCSUhwcD628pRllm7n+E+YTzJw==}
     engines: {node: '>= 14'}
 
-  socks@2.8.3:
-    resolution: {integrity: sha512-l5x7VUUWbjVFbafGLxPWkYsHIhEvmF85tbIeFZWc8ZPtoMyybuEhL7Jye/ooC4/d48FgOjSJXgsF/AJPYCW8Zw==}
-    engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
-
   socks@2.8.4:
     resolution: {integrity: sha512-D3YaD0aRxR3mEcqnidIs7ReYJFVzWdd6fXJYUM8ixcQcJRGTka/b3saV0KflYhyVJXKhb947GndU35SxYNResQ==}
     engines: {node: '>= 10.0.0', npm: '>= 3.0.0'}
@@ -10875,7 +10871,7 @@ snapshots:
       - vue
       - ws
 
-  '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#fc39f9b744cab3a0f258a1bea9a0626dc294e94c(@google-cloud/vertexai@1.9.2)(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(@langchain/groq@0.1.3(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(bufferutil@4.0.9)(react@19.0.0)(sswr@2.1.0(svelte@5.18.0))(svelte@5.18.0)(utf-8-validate@5.0.10)(vue@3.5.13(typescript@5.6.3))(whatwg-url@7.1.0)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
+  '@elizaos/client-twitter@git+https://git@github.com:untukmuai/foru-client-twitter.git#bbe02ddb54654108935e5090d80b59f5a3e404b2(@google-cloud/vertexai@1.9.2)(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(@langchain/groq@0.1.3(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(bufferutil@4.0.9)(react@19.0.0)(sswr@2.1.0(svelte@5.18.0))(svelte@5.18.0)(utf-8-validate@5.0.10)(vue@3.5.13(typescript@5.6.3))(whatwg-url@7.1.0)(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))':
     dependencies:
       '@elizaos/core': 0.1.9(@google-cloud/vertexai@1.9.2)(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(@langchain/groq@0.1.3(@langchain/core@0.3.30(openai@4.84.0(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(zod@3.24.1)))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10)))(axios@1.7.9)(react@19.0.0)(sswr@2.1.0(svelte@5.18.0))(svelte@5.18.0)(vue@3.5.13(typescript@5.6.3))(ws@8.18.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))
       agent-twitter-client: 0.0.18(bufferutil@4.0.9)(utf-8-validate@5.0.10)
@@ -20439,14 +20435,9 @@ snapshots:
     dependencies:
       agent-base: 7.1.3
       debug: 4.4.0
-      socks: 2.8.3
+      socks: 2.8.4
     transitivePeerDependencies:
       - supports-color
-
-  socks@2.8.3:
-    dependencies:
-      ip-address: 9.0.5
-      smart-buffer: 4.2.0
 
   socks@2.8.4:
     dependencies:
