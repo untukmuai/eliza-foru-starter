@@ -5,7 +5,7 @@ steps:
       - |
         gcloud compute ssh agent-core-dev \
           --zone=asia-southeast1-a \
-          --command='git config --global --add safe.directory /home/aliusman/agent-core-dev && cd /home/aliusman/agent-core-dev && GIT_SSH_COMMAND="ssh -i /home/aliusman/.ssh/id_ed25519 -o IdentitiesOnly=yes" git pull && sudo docker compose up -d'
+          --command='cd /home/aliusman/agent-core-dev && sudo pull.sh'
     id: Update dev server
     entrypoint: /bin/bash
     
