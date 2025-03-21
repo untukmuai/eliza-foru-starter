@@ -22,7 +22,7 @@ export class PostgreSQLCacheAdapter implements IDatabaseCacheAdapter {
     key: string;
   }): Promise<string | undefined> {
     const result = await this.db.db.query(
-      "SELECT value::text AS value FROM cache WHERE agentId = $1 AND key = $2",
+      'SELECT value::text AS value FROM cache WHERE "agentId" = $1 AND key = $2',
       [params.agentId, params.key]
     );
 
@@ -40,7 +40,7 @@ export class PostgreSQLCacheAdapter implements IDatabaseCacheAdapter {
     value: string;
   }): Promise<boolean> {
     await this.db.db.query(
-      "INSERT INTO cache (agentId, key, value) VALUES ($1, $2, $3)",
+      `INSERT INTO cache ("agentId", key, value) VALUES ($1, $2, $3) ON CONFLICT ("agentId", key) DO UPDATE SET value = EXCLUDED.value`,
       [params.agentId, params.key, params.value]
     );
     return true;
@@ -48,7 +48,7 @@ export class PostgreSQLCacheAdapter implements IDatabaseCacheAdapter {
 
   async deleteCache(params: { agentId: UUID; key: string }): Promise<boolean> {
     await this.db.db.query(
-      "DELETE FROM cache WHERE agentId = $1 AND key = $2",
+      'DELETE FROM cache WHERE "agentId" = $1 AND key = $2',
       [params.agentId, params.key]
     );
     return true;
