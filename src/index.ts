@@ -15,7 +15,7 @@ import { bootstrapPlugin } from "@elizaos/plugin-bootstrap";
 import { createNodePlugin } from "@elizaos/plugin-node";
 import { solanaPlugin } from "@elizaos/plugin-solana";
 import net from "net";
-import { initializeDbCache } from "./cache/index.ts";
+import { initializeDbCache, PostgreSQLCacheAdapter } from "./cache/index.ts";
 import { character } from "./character.ts";
 import { startChat } from "./chat/index.ts";
 import { initializeClients } from "./clients/index.ts";
@@ -81,7 +81,7 @@ async function startAgent(
 
     const token = getTokenForProvider(character.modelProvider, character);
 
-    const cache = initializeDbCache(character, db);
+    const cache = initializeDbCache(character, new PostgreSQLCacheAdapter(db));
 
     const runtime = createAgent(character, db, cache, token);
 
