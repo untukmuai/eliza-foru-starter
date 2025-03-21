@@ -36,7 +36,7 @@
     "dotenv": "^16.4.7",
     "express": "4.21.1",
     "express-basic-auth": "^1.2.1",
-    "foru-client-twitter": "git+ssh://git@github.com:untukmuai/foru-client-twitter.git#bbe02ddb54654108935e5090d80b59f5a3e404b2",
+    "foru-client-twitter": "git+ssh://git@github.com:untukmuai/foru-client-twitter.git#c343060f3c599d88a99836c51fae9e11a1606a52",
     "multer": "1.4.5-lts.1",
     "net": "1.0.2",
     "openai": "^4.84.0",
