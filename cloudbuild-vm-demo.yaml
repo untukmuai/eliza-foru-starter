@@ -1,0 +1,13 @@
+steps:
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - '-c'
+      - |
+        gcloud compute ssh agent-core-dev \
+          --zone=asia-southeast1-a \
+          --command='sudo -u aliusman -i && cd /home/aliusman/agent-core-demo && sudo ./pull.sh'
+    id: Update dev server
+    entrypoint: /bin/bash
+    
+options:
+  logging: CLOUD_LOGGING_ONLY
